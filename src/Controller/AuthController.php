@@ -28,21 +28,8 @@ final class AuthController extends AbstractController
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
 
-
-
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-
-                $role = $form->get('role')->getData();
-        
-                // Gérer les champs selon le rôle
-                if ($role === 'PLAYER') {
-                    $user->setExperience(null);
-                    $user->setSalaire(null);
-                } elseif ($role === 'NUTRITIONIST') {
-                    $user->setNiveauJoueur(null);
-                    $user->setIsPremium(null);
-                }
                 try {
                     // Debugging: Log form data
                     dump($user);

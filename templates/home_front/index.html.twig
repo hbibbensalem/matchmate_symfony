@@ -16,16 +16,207 @@
                         Rejoignez-nous dès aujourd'hui et découvrez une nouvelle façon de vivre le sport raquettes&nbsp;<br><br>
                     </p>
                     <div class="mbr-section-btn">
-                        {% if not app.user %}
-                            <a class="btn btn-warning display-7" href="{{ path('app_login') }}">
-                                <span class="mobi-mbri mobi-mbri-cursor-click mbr-iconfont mbr-iconfont-btn" style="color: rgb(255, 125, 25);"></span>Se connecter&nbsp;
-                            </a>
-                        {% endif %}
+                        <a class="btn btn-warning display-7" href="{{ path('app_home_front') }}">
+                            <span class="mobi-mbri mobi-mbri-cursor-click mbr-iconfont mbr-iconfont-btn" style="color: rgb(255, 125, 25);"></span>S'inscrire&nbsp;
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
     </section>
+    
+       <!-- Section de tarification -->
+  <div class="aa-price-package section" id="pricing">
+    <div class="container">
+      <div class="text-center">
+        <h2 class="title">Nous avons le forfait parfait pour vous</h2>
+        <p class="pb-5">Découvrez nos offres adaptées à vos besoins sportifs.<br/>Choisissez le forfait qui correspond à votre pratique.</p>
+      </div>
+      <div class="row">
+        <div class="col-lg-3 col-md-6">
+          <div class="card aa-price text-center">
+            <div class="card-body">
+              <div class="h5 mt-0">Basique</div>
+              <div class="aa-price-section"><sup>DT</sup><span>12.0</span><small>/mois</small></div>
+              <ul class="list-unstyled text-muted">
+                <li class="pt-3">1 terrain inclus</li>
+                <li>Accès aux événements</li>
+                <li>Support par email</li>
+                <li>Réservation simple</li>
+              </ul>
+            </div>
+            <div class="card-footer">
+              <p><a href="#" class="text-muted text-small">Essai gratuit</a></p>
+              <a class="btn btn-outline-default btn-round" href="#">S'abonner</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+          <div class="card text-center aa-price aa-price-active">
+            <div class="card-body">
+              <div class="h5 mt-0">Standard</div>
+              <div class="aa-price-section bg-gradient"><sup>DT</sup><span>24.0</span><small>/mois</small></div>
+              <ul class="list-unstyled text-muted">
+                <li class="pt-3">3 terrains inclus</li>
+                <li>Accès premium aux événements</li>
+                <li>Support prioritaire</li>
+                <li>Réservation avancée</li>
+              </ul>
+            </div>
+            <div class="card-footer">
+              <p><a href="#" class="text-muted text-small">Essai gratuit</a></p>
+              <a class="btn btn-outline-default btn-round" href="#">S'abonner</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+          <div class="card aa-price text-center">
+            <div class="card-body">
+              <div class="h5 mt-0">Premium</div>
+              <div class="aa-price-section"><sup>DT</sup><span>50.0</span><small>/mois</small></div>
+              <ul class="list-unstyled text-muted">
+                <li class="pt-3">Terrains illimités</li>
+                <li>Accès VIP aux événements</li>
+                <li>Support 24/7</li>
+                <li>Réservation instantanée</li>
+              </ul>
+            </div>
+            <div class="card-footer">
+              <p><a href="#" class="text-muted text-small">Essai gratuit</a></p>
+              <a class="btn btn-outline-default btn-round" href="#">S'abonner</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+          <div class="card aa-price text-center">
+            <div class="card-body">
+              <div class="h5 mt-0">Club</div>
+              <div class="aa-price-section"><sup>DT</sup><span>99.0</span><small>/mois</small></div>
+              <ul class="list-unstyled text-muted">
+                <li class="pt-3">Pour les clubs sportifs</li>
+                <li>Gestion d'équipe</li>
+                <li>Statistiques avancées</li>
+                <li><b>Support dédié</b></li>
+              </ul>
+            </div>
+            <div class="card-footer">
+              <p><a href="#" class="text-muted text-small">Essai gratuit</a></p>
+              <a class="btn btn-outline-default btn-round" href="#">Contactez-nous</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section témoignages -->
+  <div class="container">
+    <hr/>
+  </div>
+  <div class="aa-testimonials-section section">
+    <div class="container">
+      <div class="text-center">
+        <h2 class="title mt-0">Ce que disent nos utilisateurs</h2>
+        <p>Découvrez les témoignages de nos membres satisfaits.<br/>MatchMate a transformé leur expérience sportive.</p>
+      </div>
+      <div class="aa-testimonials">
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <div class="aa-testimonials-body">
+              <p>MatchMate a révolutionné ma façon de jouer au tennis. Je trouve toujours des partenaires de jeu motivés et des terrains disponibles facilement.</p>
+              <div class="row pt-3">
+                <div class="col-lg-5 col-md-12"><img class="img-fluid" src="{{ asset('front/images/user1.jpg') }}" alt="Joueur de tennis"/></div>
+                <div class="col-lg-7 col-md-12 pt-3">
+                  <div class="h5">Mohamed Ali</div>
+                  <p class="text-muted">Joueur de tennis</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <div class="aa-testimonials-body">
+              <p>En tant que club de badminton, MatchMate nous a permis d'organiser nos entraînements et compétitions de manière beaucoup plus efficace.</p>
+              <div class="row pt-3">
+                <div class="col-lg-5 col-md-12"><img class="img-fluid" src="{{ asset('front/images/user2.jpg') }}" alt="Entraîneur de badminton"/></div>
+                <div class="col-lg-7 col-md-12 pt-3">
+                  <div class="h5">Sarah Ben Ammar</div>
+                  <p class="text-muted">Entraîneuse, Club de Badminton</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <div class="aa-testimonials-body">
+              <p>L'application est intuitive et me permet de réserver des terrains de squash en quelques clics seulement. Un gain de temps considérable!</p>
+              <div class="row pt-3">
+                <div class="col-lg-5 col-md-12"><img class="img-fluid" src="{{ asset('front/images/user3.jpg') }}" alt="Joueur de squash"/></div>
+                <div class="col-lg-7 col-md-12 pt-3">
+                  <div class="h5">Karim Jlassi</div>
+                  <p class="text-muted">Joueur de squash</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section téléchargement -->
+  <div class="aa-download-section section bg-gradient" id="download">         
+    <div class="container">
+      <div class="h2 text-center text-title text-white pb-5">Téléchargez MatchMate dès maintenant</div>
+      <div class="row">
+        <div class="col-md-4 col-sm-12"><a class="aa-apple" href="#">
+            <div class="card">
+              <div class="row pb-3">
+                <div class="col-lg-3 col-md-12 aa-download-icon"><i class="pt-4 fas fa-apple fa-4x" aria-hidden="true"></i></div>
+                <div class="col-lg-9 col-md-12 aa-download-icon-detail">
+                  <div class="h4 pb-1">Télécharger</div>
+                  <p class="text-muted">Disponible sur l'App Store</p>
+                </div>
+              </div>
+            </div></a></div>
+        <div class="col-md-4 col-sm-12"><a class="aa-android" href="#">
+            <div class="card">
+              <div class="row pb-3">
+                <div class="col-lg-3 col-md-12 aa-download-icon"><i class="pt-4 fas fa-robot fa-4x" aria-hidden="true"></i></div>
+                <div class="col-lg-9 col-md-12 aa-download-icon-detail">
+                  <div class="h4 pb-1">Télécharger</div>
+                  <p class="text-muted">Disponible sur Google Play</p>
+                </div>
+              </div>
+            </div></a></div>
+        <div class="col-md-4 col-sm-12"><a class="aa-web" href="#">
+            <div class="card">
+              <div class="row pb-3">
+                <div class="col-lg-3 col-md-12 aa-download-icon"><i class="pt-4 fas fa-globe fa-4x" aria-hidden="true"></i></div>
+                <div class="col-lg-9 col-md-12 aa-download-icon-detail">
+                  <div class="h4 pb-1">Accéder</div>
+                  <p class="text-muted">Version Web</p>
+                </div>
+              </div>
+            </div></a></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer-black aa-footer">
+    <div class="container py-5">
+      <div class="row text-center">
+        <div class="col-md-12">
+          <a class="btn btn-link btn-neutral" href="#"><i class="fab fa-facebook fa-2x" aria-hidden="true"></i></a>
+          <a class="btn btn-link btn-neutral" href="#"><i class="fab fa-twitter fa-2x" aria-hidden="true"></i></a>
+          <a class="btn btn-link btn-neutral" href="#"><i class="fab fa-instagram fa-2x" aria-hidden="true"></i></a>
+          <a class="btn btn-link btn-neutral" href="#"><i class="fab fa-youtube fa-2x" aria-hidden="true"></i></a>
+        </div>
+        <div class="col-md-12">
+          <p class="mt-3">Copyright &copy; 2023 MatchMate. Tous droits réservés.<br>Conçu avec passion pour les amateurs de sports de raquette</p>
+        </div>
+      </div>
+    </div>
+  </footer>
 
     <section class="display-7" style="padding: 0;align-items: center;justify-content: center;flex-wrap: wrap; align-content: center;display: flex;position: relative;height: 4rem;">
         <a href="https://mobiri.se/" style="flex: 1 1;height: 4rem;position: absolute;width: 100%;z-index: 1;">

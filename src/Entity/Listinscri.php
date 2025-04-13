@@ -11,8 +11,9 @@ class Listinscri
 {
 
     #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: "AUTO")]
     #[ORM\Column(type: "integer")]
-    private int $id;
+    private ?int $id = null;
 
         #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "listinscris")]
     #[ORM\JoinColumn(name: 'id_user', referencedColumnName: 'id_user', onDelete: 'CASCADE')]

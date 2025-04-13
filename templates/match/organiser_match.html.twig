@@ -1,0 +1,559 @@
+{% extends 'baseFront.html.twig' %}
+
+{% block title %}Organiser un Match{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Ajout d'espace entre navbar et formulaire */
+        section.py-5 {
+            padding-top: 100px !important;
+            padding-bottom: 100px !important;
+        }
+        
+        .invalid-feedback {
+            color: #dc3545;
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .is-invalid {
+            border-color: #dc3545 !important;
+        }
+
+        .custom-select-wrapper.is-invalid::after {
+            color: #dc3545;
+        }
+        
+        .match-form-container {
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+            padding: 50px;
+            margin: 40px auto;
+            max-width: 1200px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .match-form-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, #10888D, #10888D);
+        }
+        
+        .form-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .form-header h3 {
+            color: #10888D;
+            font-weight: 800;
+            margin-bottom: 15px;
+            font-size: 2.5rem;
+            letter-spacing: -0.5px;
+        }
+        
+        .form-header p {
+            color: #6c757d;
+            font-size: 1.15rem;
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .form-control {
+            height: 52px;
+            border-radius: 10px;
+            border: 2px solid #e8f0fe;
+            padding: 12px 20px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            font-size: 1rem;
+            background-color: #f9fbfd;
+        }
+        
+        .form-control:focus {
+            border-color: #FF6B00;
+            box-shadow: 0 5px 15px rgba(255, 107, 0, 0.15);
+            background-color: #fff;
+        }
+        
+        textarea.form-control {
+            min-height: 140px;
+            resize: vertical;
+            padding: 15px 20px;
+        }
+        
+        .form-group {
+            position: relative;
+            margin-bottom: 30px;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 10px;
+            display: block;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+        
+        .form-group.focused label {
+            color: #FF6B00;
+        }
+        
+        .btn-submit {
+            background: linear-gradient(135deg, #FF6B00, #FF8C00);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.15rem;
+            border-radius: 12px;
+            font-weight: 700;
+            transition: all 0.4s;
+            width: 100%;
+            max-width: 280px;
+            margin: 30px auto 0;
+            display: block;
+            box-shadow: 0 4px 15px rgba(255, 107, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 107, 0, 0.4);
+        }
+        
+        .btn-submit::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .btn-submit:hover::after {
+            left: 100%;
+        }
+        
+        .form-image-container {
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            height: 100%;
+            min-height: 500px;
+            position: relative;
+        }
+        
+        .form-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+        
+        .form-image-container:hover .form-image {
+            transform: scale(1.03);
+        }
+        
+        .form-section {
+            margin-bottom: 15px;
+        }
+        
+        .icon-prefix {
+            position: absolute;
+            left: 20px;
+            top: 42px;
+            color: #FF6B00;
+            font-size: 1.1rem;
+        }
+        
+        .form-control.with-icon {
+            padding-left: 50px;
+        }
+        
+        .select-arrow {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #FF6B00;
+            pointer-events: none;
+        }
+        
+        /* Styles pour les messages flash */
+        .alert {
+            border-radius: 12px;
+            padding: 15px 25px;
+            margin-bottom: 30px;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .alert-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .alert-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .alert-dismissible .close {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 0.75rem 1.25rem;
+            color: inherit;
+            opacity: 0.8;
+        }
+
+        .alert-dismissible .close:hover {
+            opacity: 1;
+        }
+        
+        @media (max-width: 991px) {
+            .match-form-container {
+                padding: 40px 30px;
+            }
+            
+            .form-image-container {
+                margin-top: 50px;
+                min-height: 350px;
+            }
+        }
+        
+        /* Animation */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .match-form-container {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+        
+        .form-group {
+            animation: fadeInUp 0.6s ease-out forwards;
+            animation-delay: calc(var(--order) * 0.1s);
+            opacity: 0;
+        }
+        
+        /* Floating labels effect */
+        .floating-label-group {
+            position: relative;
+            margin-bottom: 30px;
+        }
+        
+        .floating-label {
+            position: absolute;
+            left: 20px;
+            top: 18px;
+            color: #6c757d;
+            transition: all 0.3s;
+            pointer-events: none;
+            background: #fff;
+            padding: 0 5px;
+            font-size: 0.95rem;
+        }
+        
+        .form-control:focus + .floating-label,
+        .form-control:not(:placeholder-shown) + .floating-label {
+            top: -10px;
+            left: 15px;
+            font-size: 0.8rem;
+            color: #FF6B00;
+            background: linear-gradient(to bottom, #fff 50%, #f9fbfd 50%);
+        }
+        
+        /* Custom select */
+        .custom-select-wrapper {
+            position: relative;
+        }
+        
+        .custom-select-wrapper::after {
+            content: "▼";
+            font-size: 0.8rem;
+            color: #FF6B00;
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <section class="py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-12">
+                    {# Messages flash #}
+                    {% for label, messages in app.flashes %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+
+                    {% if form.vars.errors|length > 0 %}
+                        <div class="alert alert-danger">
+                            <ul>
+                                {% for error in form.vars.errors %}
+                                    <li>{{ error.message }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    <div class="match-form-container">
+                        <div class="row align-items-center">
+                            <div class="col-lg-6">
+                                <div class="form-header">
+                                    <h3>Organiser un Match</h3>
+                                    <p>Créez votre match et trouvez des coéquipiers ou adversaires</p>
+                                </div>
+                                
+                                {{ form_start(form, {'attr': {'class': 'match-form', 'novalidate': 'novalidate'}}) }}
+
+                                    <div class="row">
+                                        <div class="col-md-6 form-section" style="--order: 1">
+                                            <div class="form-group">
+                                                <i class="fas fa-calendar-day icon-prefix"></i>
+                                                {{ form_label(form.date) }}
+                                                {{ form_widget(form.date, {
+                                                    'attr': {
+                                                        'class': 'form-control with-icon' ~ (form.date.vars.errors|length ? ' is-invalid'),
+                                                        'placeholder': ' '
+                                                    }
+                                                }) }}
+                                                {{ form_errors(form.date) }}
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6 form-section" style="--order: 2">
+                                            <div class="form-group">
+                                                <i class="fas fa-clock icon-prefix"></i>
+                                                {{ form_label(form.heure) }}
+                                                {{ form_widget(form.heure, {
+                                                    'attr': {
+                                                        'class': 'form-control with-icon' ~ (form.heure.vars.errors|length ? ' is-invalid'),
+                                                        'placeholder': ' '
+                                                    }
+                                                }) }}
+                                                {{ form_errors(form.heure) }}
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-12 form-section" style="--order: 3">
+                                            <div class="form-group floating-label-group">
+                                                {{ form_label(form.localisation) }}
+                                                {{ form_widget(form.localisation, {
+                                                    'attr': {
+                                                        'class': 'form-control' ~ (form.localisation.vars.errors|length ? ' is-invalid'),
+                                                        'placeholder': ' '
+                                                    }
+                                                }) }}
+                                                <span class="floating-label">Adresse ou lieu du match</span>
+                                                {{ form_errors(form.localisation) }}
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-12 form-section" style="--order: 4">
+                                            <div class="form-group floating-label-group">
+                                                {{ form_label(form.terrain) }}
+                                                {{ form_widget(form.terrain, {
+                                                    'attr': {
+                                                        'class': 'form-control' ~ (form.terrain.vars.errors|length ? ' is-invalid'),
+                                                        'placeholder': ' '
+                                                    }
+                                                }) }}
+                                                <span class="floating-label">Nom du terrain ou club</span>
+                                                {{ form_errors(form.terrain) }}
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6 form-section" style="--order: 5">
+                                            <div class="form-group">
+                                                <div class="custom-select-wrapper {% if form.nb_personne.vars.errors|length %}is-invalid{% endif %}">
+                                                    {{ form_label(form.nb_personne) }}
+                                                    {{ form_widget(form.nb_personne, {
+                                                        'attr': {
+                                                            'class': 'form-control' ~ (form.nb_personne.vars.errors|length ? ' is-invalid')
+                                                        }
+                                                    }) }}
+                                                </div>
+                                                {{ form_errors(form.nb_personne) }}
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6 form-section" style="--order: 6">
+                                            <div class="form-group">
+                                                <div class="custom-select-wrapper {% if form.typesport.vars.errors|length %}is-invalid{% endif %}">
+                                                    {{ form_label(form.typesport) }}
+                                                    {{ form_widget(form.typesport, {
+                                                        'attr': {
+                                                            'class': 'form-control' ~ (form.typesport.vars.errors|length ? ' is-invalid')
+                                                        }
+                                                    }) }}
+                                                </div>
+                                                {{ form_errors(form.typesport) }}
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-12 form-section" style="--order: 7">
+                                            <div class="form-group floating-label-group">
+                                                {{ form_label(form.description) }}
+                                                {{ form_widget(form.description, {
+                                                    'attr': {
+                                                        'class': 'form-control' ~ (form.description.vars.errors|length ? ' is-invalid'),
+                                                        'placeholder': ' ',
+                                                        'rows': 4
+                                                    }
+                                                }) }}
+                                                <span class="floating-label">Description (facultative)</span>
+                                                {{ form_errors(form.description) }}
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-12 text-center" style="--order: 8">
+                                            <button type="submit" class="btn btn-submit">
+                                                <i class="fas fa-plus-circle mr-2"></i> Planifier le Match
+                                            </button>
+                                        </div>
+                                    </div>
+                                {{ form_end(form) }}
+                            </div>
+                            
+                            <div class="col-lg-6">
+                                <div class="form-image-container">
+                                    <img src="{{ asset('front/images/capture-dcran-2025-01-28-205846-552x582.png') }}" alt="Match sportif" class="form-image">
+                                    <div class="image-overlay"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Animation pour les champs du formulaire
+        document.querySelectorAll('.form-group').forEach((group, index) => {
+            group.style.animationDelay = `${index * 0.1}s`;
+            
+            // Add focused class when input is focused
+            const input = group.querySelector('input, textarea, select');
+            if (input) {
+                input.addEventListener('focus', function() {
+                    group.classList.add('focused');
+                    this.classList.remove('is-invalid');
+                    
+                    // Remove error message when focusing
+                    const errorElement = this.nextElementSibling;
+                    if (errorElement && errorElement.classList.contains('invalid-feedback')) {
+                        errorElement.style.display = 'none';
+                    }
+                });
+                
+                input.addEventListener('blur', function() {
+                    if (!this.value) {
+                        group.classList.remove('focused');
+                    }
+                });
+                
+                // Check if input has value on load
+                if (input.value) {
+                    group.classList.add('focused');
+                }
+            }
+        });
+        
+        // Floating labels functionality
+        document.querySelectorAll('.form-control').forEach(input => {
+            input.addEventListener('focus', function() {
+                const label = this.nextElementSibling;
+                if (label && label.classList.contains('floating-label')) {
+                    label.style.color = '#FF6B00';
+                }
+            });
+            
+            input.addEventListener('blur', function() {
+                const label = this.nextElementSibling;
+                if (label && label.classList.contains('floating-label')) {
+                    label.style.color = '#6c757d';
+                }
+            });
+            
+            // Initialize labels if input has value
+            if (input.value) {
+                const label = input.nextElementSibling;
+                if (label && label.classList.contains('floating-label')) {
+                    label.style.top = '-10px';
+                    label.style.left = '15px';
+                    label.style.fontSize = '0.8rem';
+                    label.style.color = '#FF6B00';
+                    label.style.background = 'linear-gradient(to bottom, #fff 50%, #f9fbfd 50%)';
+                }
+            }
+        });
+        
+        // Add ripple effect to button
+        document.querySelector('.btn-submit')?.addEventListener('click', function(e) {
+            let x = e.clientX - e.target.getBoundingClientRect().left;
+            let y = e.clientY - e.target.getBoundingClientRect().top;
+            
+            let ripple = document.createElement('span');
+            ripple.style.left = `${x}px`;
+            ripple.style.top = `${y}px`;
+            this.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 1000);
+        });
+        
+        // Show all error messages on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.is-invalid').forEach(field => {
+                const errorElement = field.nextElementSibling;
+                if (errorElement && errorElement.classList.contains('invalid-feedback')) {
+                    errorElement.style.display = 'block';
+                }
+            });
+            
+            // Auto-dismiss flash messages after 5 seconds
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.transition = 'opacity 0.5s ease-out';
+                    alert.style.opacity = '0';
+                    setTimeout(() => alert.remove(), 500);
+                }, 5000);
+            });
+        });
+    </script>
+{% endblock %}

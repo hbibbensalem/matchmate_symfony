@@ -1,0 +1,173 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Hôte : localhost:3307
+-- Généré le : jeu. 03 avr. 2025 à 21:02
+-- Version du serveur : 10.4.28-MariaDB
+-- Version de PHP : 8.0.28
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Base de données : `gestion_match`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `doctrine_migration_versions`
+--
+
+CREATE TABLE `doctrine_migration_versions` (
+  `version` varchar(191) NOT NULL,
+  `executed_at` datetime DEFAULT NULL,
+  `execution_time` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `listinscri`
+--
+
+CREATE TABLE `listinscri` (
+  `id` int(11) NOT NULL,
+  `matchId` int(11) NOT NULL,
+  `userId` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `listinscri`
+--
+
+INSERT INTO `listinscri` (`id`, `matchId`, `userId`) VALUES
+(41, 14, 10),
+(42, 15, 12),
+(46, 20, 30),
+(47, 16, 28),
+(49, 19, 2),
+(50, 17, 2),
+(51, 22, 30),
+(52, 40, 41);
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `match1`
+--
+
+CREATE TABLE `match1` (
+  `id` int(11) NOT NULL,
+  `date` date NOT NULL,
+  `heure` varchar(255) NOT NULL,
+  `localisation` varchar(255) NOT NULL,
+  `terrain` varchar(255) DEFAULT NULL,
+  `description` longtext DEFAULT NULL,
+  `typesport` varchar(255) NOT NULL,
+  `statut` varchar(20) NOT NULL,
+  `nb_personne` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `match1`
+--
+
+INSERT INTO `match1` (`id`, `date`, `heure`, `localisation`, `terrain`, `description`, `typesport`, `statut`, `nb_personne`, `user_id`) VALUES
+(36, '2025-03-30', '10:00', 'ARIANA', 'Stade Olympique de Radès', 'ouiii', 'Tennis', 'confirmé', 0, 0),
+(37, '2025-03-16', '10:00', 'ARIANA', 'Stade Olympique de Radès', 'ouiii', 'Tennis', 'confirmé', 0, 0),
+(38, '2025-04-26', '10:00', 'ARIANA', 'Terrain Municipal d\'Ariana', 'OUIIIIII', 'Padel', 'en_attente', 0, 0),
+(40, '2025-03-22', '10:00:00', 'JENDOUBA', 'Stade Municipal de Jendouba', 'OUIIIIIII NCHALLAHHHH', 'Padel', 'confirmé', 0, 0),
+(41, '2025-03-22', '10:00:00', 'ARIANA', 'Stade Olympique de Radès', 'ouii', 'Tennis', 'en_attente', 0, 0),
+(42, '2025-07-31', '09:00:00', 'BEN AROUS', 'Terrain de Mégrine', 'yessss', 'Tennis', 'confirmé', 0, 0),
+(43, '2025-08-02', '10:10:00', 'JENDOUBA', 'Stade Municipal de Jendouba', 'OUII ouii', 'Tennis', 'confirmé', 0, 0),
+(44, '2025-03-04', '12:12:00', 'BEJA', 'Terrain de la Cité Sportive', 'ouiii', 'Ping Pong', 'confirmé', 0, 0),
+(45, '2025-06-12', '11:00:00', 'KEBILI', 'Terrain de Douz', 'kkkkkkNNN', 'Padel', 'confirmé', 0, 0),
+(46, '2025-05-23', '10:00', 'GAFSA', 'Terrain de Métlaoui', 'padel', 'Padel', 'confirmé', 0, 0),
+(47, '2025-04-26', '09:00', 'GABES', 'Terrain de Chenini', 'padel', 'Padel', 'confirmé', 0, 0),
+(48, '2025-03-15', '10:00', 'MONASTIR', 'Terrain de Moknine', 'nn', 'Tennis', 'en_attente', 0, 0),
+(49, '2025-03-15', '11:00', 'MONASTIR', 'Terrain de Moknine', 'nn', 'Tennis', 'en_attente', 0, 0),
+(50, '2025-03-16', '11:00', 'BIZERTE', 'Stade 15 Octobre', 'kkkkkk', 'Tennis', 'en_attente', 0, 0),
+(51, '2025-03-16', '09:00', 'JENDOUBA', 'Stade Municipal de Jendouba', 'jjjjj', 'Tennis', 'en_attente', 0, 0),
+(52, '2025-03-29', '08:00', 'GAFSA', 'Stade Municipal de Gafsa', 'yyyyyy', 'Tennis', 'en_attente', 0, 0),
+(53, '2025-03-29', '11:00', 'GAFSA', 'Stade Municipal de Gafsa', 'jjj', 'Padel', 'en_attente', 0, 0),
+(54, '2025-03-22', '11:45', 'JENDOUBA', 'Stade Municipal de Jendouba', 'KKKKKK', 'Tennis', 'en_attente', 0, 0),
+(55, '2025-03-30', '10:15', 'ARIANA', 'Stade Olympique de Radès', 'nnnn', 'Padel', 'confirmé', 0, 0),
+(56, '2025-04-05', '09:00', 'ARIANA', 'Stade Olympique de Radès', 'nn', 'Tennis', 'confirmé', 0, 0),
+(57, '2025-03-09', '10:13:00', 'ARIANA', 'Stade Olympique de Radès', 'yes yessssss', 'Tennis', 'en_attente', 0, 0),
+(58, '2025-04-09', '09:00:00', 'ARIANA', 'Terrain Municipal d\'Ariana', 'oui', 'Tennis', 'en_attente', 0, 0),
+(59, '2025-03-16', '11:15', 'BEJA', 'Stade Municipal de Béja', 'oui', 'Tennis', 'en_attente', 0, 0),
+(60, '2025-04-19', '11:00', 'ARIANA', 'Terrain Municipal d\'Ariana', 'aucun', 'Tennis', 'en_attente', 0, 0),
+(61, '2025-04-11', '11:00', 'ARIANA', 'Stade Olympique de Radès', 'NN', 'Tennis', 'en_attente', 0, 0),
+(62, '2025-05-08', '10:00', 'ARIANA', 'Terrain Municipal d\'Ariana', 'aucun', 'Tennis', 'en_attente', 0, 0);
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `messenger_messages`
+--
+
+CREATE TABLE `messenger_messages` (
+  `id` bigint(20) NOT NULL,
+  `body` longtext NOT NULL,
+  `headers` longtext NOT NULL,
+  `queue_name` varchar(190) NOT NULL,
+  `created_at` datetime NOT NULL,
+  `available_at` datetime NOT NULL,
+  `delivered_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Index pour les tables déchargées
+--
+
+--
+-- Index pour la table `doctrine_migration_versions`
+--
+ALTER TABLE `doctrine_migration_versions`
+  ADD PRIMARY KEY (`version`);
+
+--
+-- Index pour la table `match1`
+--
+ALTER TABLE `match1`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Index pour la table `messenger_messages`
+--
+ALTER TABLE `messenger_messages`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `IDX_75EA56E0FB7336F0` (`queue_name`),
+  ADD KEY `IDX_75EA56E0E3BD61CE` (`available_at`),
+  ADD KEY `IDX_75EA56E016BA31DB` (`delivered_at`);
+
+--
+-- AUTO_INCREMENT pour les tables déchargées
+--
+
+--
+-- AUTO_INCREMENT pour la table `match1`
+--
+ALTER TABLE `match1`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
+
+--
+-- AUTO_INCREMENT pour la table `messenger_messages`
+--
+ALTER TABLE `messenger_messages`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

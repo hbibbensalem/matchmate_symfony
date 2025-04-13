@@ -107,19 +107,19 @@ public function generateCustomId(): void
     #[ORM\Column(type: "string", length: 255)]
     private string $role;
 
-    #[ORM\Column(type: "string", length: 255 , nullable: true)]
+    #[ORM\Column(type: "string", length: 255)]
     private string $experience;
 
-    #[ORM\Column(type: "float" , nullable: true)]
+    #[ORM\Column(type: "float")]
     private float $salaire;
 
-    #[ORM\Column(type: "string", length: 255 , nullable: true)]
+    #[ORM\Column(type: "string", length: 255)]
     private string $niveau_joueur;
 
     #[ORM\Column(type: "integer")]
     private int $max_distance_user;
 
-    #[ORM\Column(type: "string", length: 1 , nullable: true)]
+    #[ORM\Column(type: "string", length: 1)]
     private string $is_premium;
 
     #[ORM\Column(type: "string", length: 255)]

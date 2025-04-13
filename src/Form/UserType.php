@@ -110,6 +110,7 @@ class UserType extends AbstractType
                 'label' => 'Rôle',
                 'choices' => [
                     'Joueur' => 'PLAYER',
+                    'Administrateur' => 'ADMIN',
                     'Nutritionniste' => 'NUTRITIONIST'
                 ],
                 'constraints' => [
@@ -119,18 +120,37 @@ class UserType extends AbstractType
             ])
             ->add('experience', ChoiceType::class, [
                 'label' => 'Expérience',
-                'required' => false,
-                'attr' => ['class' => 'form-control role-dependent role-nutritionist'],
+                'choices' => [
+                    '1 an' => 'ONE_YEAR',
+                    '2 ans' => 'TWO_YEARS',
+                    '3 ans' => 'THREE_YEARS',
+                    '4 ans et plus' => 'FOUR_YEARS_PLUS'
+                ],
+                'attr' => ['class' => 'form-control']
             ])
             ->add('salaire', NumberType::class, [
                 'label' => 'Salaire',
-                'required' => false,
-                'attr' => ['class' => 'form-control role-dependent role-nutritionist'],
+                'constraints' => [
+                    new NotBlank(['message' => 'Le salaire ne peut pas être vide']),
+                    new Regex([
+                        'pattern' => '/^\d+(\.\d{1,2})?$/',
+                        'message' => 'Le salaire doit être un nombre valide'
+                    ]),
+                ],
+                'attr' => [
+                    'class' => 'form-control',
+                    'min' => 0,
+                    'step' => '0.01'
+                ]
             ])
             ->add('niveau_joueur', ChoiceType::class, [
                 'label' => 'Niveau du joueur',
-                'required' => false,
-                'attr' => ['class' => 'form-control role-dependent role-player'],
+                'choices' => [
+                    'Débutant' => 'DEBUTANT',
+                    'Intermédiaire' => 'INTERMEDIAIRE',
+                    'Expert' => 'EXPERT'
+                ],
+                'attr' => ['class' => 'form-control']
             ])
             ->add('max_distance_user', NumberType::class, [
                 'label' => 'Distance maximale (km)',
@@ -148,12 +168,11 @@ class UserType extends AbstractType
             ])
             ->add('is_premium', ChoiceType::class, [
                 'label' => 'Premium',
-                'required' => false,
                 'choices' => [
-                    'Oui' => true,
-                    'Non' => false
+                    'Oui' => '1',
+                    'Non' => '0'
                 ],
-                'attr' => ['class' => 'form-control role-dependent role-player'],
+                'attr' => ['class' => 'form-control']
             ])
             ->add('photo_user', FileType::class, [
                 'label' => 'Photo de profil',
