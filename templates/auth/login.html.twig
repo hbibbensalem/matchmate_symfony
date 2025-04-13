@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- Mêmes balises meta et liens que dans register.html.twig -->
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Mobirise v5.9.25, mobirise.com">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+  <link rel="shortcut icon" href="{{ asset('front/images/cree-un-logo-pour-un-site-web-de-sport-raquettes-sur-le-nom-matchmate-removebg-preview-1-260x147.png') }}" type="image/x-icon">
+  <meta name="description" content="">
+  
+  <title>Connexion - MatchMate</title>
+  <link rel="stylesheet" href="{{ asset('front/web/assets/mobirise-icons2/mobirise2.css') }}">
+  <link rel="stylesheet" href="{{ asset('front/bootstrap/css/bootstrap.min.css') }}">
+  <link rel="stylesheet" href="{{ asset('front/bootstrap/css/bootstrap-grid.min.css') }}">
+  <link rel="stylesheet" href="{{ asset('front/bootstrap/css/bootstrap-reboot.min.css') }}">
+  <link rel="stylesheet" href="{{ asset('front/animatecss/animate.css') }}">
+  <link rel="stylesheet" href="{{ asset('front/dropdown/css/style.css') }}">
+  <link rel="stylesheet" href="{{ asset('front/theme/css/style.css') }}">
+  <link rel="preload" href="https://fonts.googleapis.com/css?family=Inter+Tight:100,200,300,400,500,600,700,800,900,100i,200i,300i,400i,500i,600i,700i,800i,900i&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter+Tight:100,200,300,400,500,600,700,800,900,100i,200i,300i,400i,500i,600i,700i,800i,900i&display=swap"></noscript>
+  <link rel="preload" as="style" href="{{ asset('front/mobirise/css/mbr-additional.css?v=XG0ubR') }}"><link rel="stylesheet" href="{{ asset('front/mobirise/css/mbr-additional.css?v=XG0ubR') }}" type="text/css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --primary-color: #10888D;
+      --primary-hover: #0E777D;
+      --secondary-color: #2C3E50;
+      --light-bg: #F8FAFC;
+      --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    
+    body {
+      font-family: 'Inter Tight', sans-serif;
+      background-color: var(--light-bg);
+      color: #333;
+      overflow-x: hidden;
+    }
+    
+    .login-container {
+      padding: 6rem 0;
+      position: relative;
+    }
+    
+    .login-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 300px;
+      background: linear-gradient(135deg, var(--primary-color), #0E777D);
+      z-index: -1;
+      clip-path: polygon(0 0, 100% 0, 100% 70%, 0 100%);
+    }
+    
+    .login-title {
+      color: white;
+      margin-bottom: 2rem;
+      text-align: center;
+      font-weight: 800;
+      font-size: 2.5rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: relative;
+      display: inline-block;
+      padding-bottom: 10px;
+    }
+    
+    .login-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 4px;
+      background: white;
+      border-radius: 2px;
+    }
+    
+    .login-card {
+      background: white;
+      border-radius: 16px;
+      padding: 2.5rem;
+      box-shadow: var(--card-shadow);
+      transition: var(--transition);
+      border: none;
+      position: relative;
+      overflow: hidden;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    
+    .login-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+    }
+    
+    .login-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: linear-gradient(to bottom, var(--primary-color), #0E777D);
+    }
+    
+    .form-control {
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 1.25rem;
+      border: 2px solid #E2E8F0;
+      transition: var(--transition);
+      font-size: 0.95rem;
+      padding-right: 40px; 
+    }
+    
+    .form-control:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(16, 136, 141, 0.2);
+    }
+    
+    .form-label {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--secondary-color);
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+    }
+    
+    .form-label i {
+      margin-right: 8px;
+      color: var(--primary-color);
+      font-size: 0.9rem;
+    }
+    
+    .btn-login {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 14px 30px;
+      font-weight: 700;
+      transition: var(--transition);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-size: 0.95rem;
+      box-shadow: 0 4px 12px rgba(16, 136, 141, 0.3);
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+    }
+    
+    .btn-login:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px rgba(16, 136, 141, 0.4);
+    }
+    
+    .btn-login:active {
+      transform: translateY(1px);
+    }
+    
+    .floating-label {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+    
+    .floating-label label {
+      position: absolute;
+      top: 14px;
+      left: 18px;
+      color: #94A3B8;
+      transition: var(--transition);
+      pointer-events: none;
+      background: white;
+      padding: 0 5px;
+    }
+    
+    .floating-label .form-control:focus + label,
+    .floating-label .form-control:not(:placeholder-shown) + label {
+      top: -10px;
+      left: 12px;
+      font-size: 0.8rem;
+      color: var(--primary-color);
+    }
+    
+    .password-toggle {
+      position: absolute;
+      right: 20px;
+      top: 30%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #94A3B8;
+      transition: var(--transition);
+    }
+
+    .password-toggle i {
+      font-size: 1.1rem;
+    }
+    
+    .password-toggle:hover {
+      color: var(--primary-color);
+    }
+    
+    .login-options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-check-input:checked {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+    
+    .login-footer {
+      text-align: center;
+      margin-top: 1.5rem;
+    }
+    
+    .social-login {
+      margin: 1.5rem 0;
+      text-align: center;
+    }
+    
+    .social-login p {
+      position: relative;
+      margin: 1.5rem 0;
+      color: #64748B;
+    }
+    
+    .social-login p::before,
+    .social-login p::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 30%;
+      height: 1px;
+      background: #E2E8F0;
+    }
+    
+    .social-login p::before {
+      left: 0;
+    }
+    
+    .social-login p::after {
+      right: 0;
+    }
+    
+    .social-icons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+    }
+    
+    .social-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      transition: var(--transition);
+    }
+    
+    .social-icon:hover {
+      transform: translateY(-3px);
+    }
+    
+    .facebook {
+      background: #3B5998;
+    }
+    
+    .google {
+      background: #DB4437;
+    }
+    
+    .twitter {
+      background: #1DA1F2;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .animate-form {
+      animation: fadeIn 0.6s ease-out forwards;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .login-container {
+        padding: 3rem 0;
+      }
+      
+      .login-title {
+        font-size: 2rem;
+      }
+      
+      .login-card {
+        padding: 1.5rem;
+      }
+    }
+    .alert {
+    border-radius: 10px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    border: none;
+    position: relative;
+}
+
+    .alert-success {
+        background-color: #D1FAE5;
+        color: #065F46;
+    }
+
+    .alert-danger {
+        background-color: #FEE2E2;
+        color: #B91C1C;
+    }
+
+    .btn-close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        background-size: 0.8rem;
+    }
+
+    .alert-dismissible {
+        padding-right: 3rem;
+    }
+  </style>
+</head>
+<body>
+  
+  <section data-bs-version="5.1" class="login-container">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="text-center mb-5">
+            <h2 class="login-title" style="color: #10888D;">Connectez-vous à MatchMate</h2>
+            <p style="color: #10888D;">Accédez à votre compte pour commencer</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    
+          
+    <div class="login-card animate-form" style="animation-delay: 0.2s;">
+      <form method="post" class="mbr-form form-with-styler" id="login-form">
+          {% for message in app.flashes('success') %}
+              <div class="alert alert-success alert-dismissible fade show" role="alert">
+                  {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+          {% endfor %}
+          
+          {% if error %}
+              <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                  {{ error.messageKey|trans(error.messageData, 'security') }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+          {% endif %}
+              
+              <div class="form-group floating-label">
+                <input type="email" name="email" id="inputEmail" value="{{ last_username }}" 
+                class="form-control" placeholder=" " autocomplete="email" required autofocus>
+                <label for="inputUsername" class="form-label"><i class="fas fa-user"></i>Nom d'utilisateur</label>
+              </div>
+              
+              <div class="form-group floating-label">
+                <input type="password" name="password" id="inputPassword" class="form-control" placeholder=" " autocomplete="current-password" required>
+                <label for="inputPassword" class="form-label"><i class="fas fa-lock"></i>Mot de passe</label>
+                <span class="password-toggle" id="togglePassword"><i class="far fa-eye"></i></span>
+              </div>
+              
+              <div class="login-options">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="rememberMe" name="_remember_me">
+                  <label class="form-check-label" for="rememberMe">Se souvenir de moi</label>
+                </div>
+                <a href="#" class="text-primary">Mot de passe oublié?</a>
+              </div>
+              
+              <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+              
+              <button type="submit" class="btn btn-login mb-3">
+                <span class="submit-text">Se connecter</span>
+                <span class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
+              </button>
+              
+              <div class="social-login">
+                <p>Ou connectez-vous avec</p>
+                <div class="social-icons">
+                  <a href="#" class="social-icon facebook"><i class="fab fa-facebook-f"></i></a>
+                  <a href="#" class="social-icon google"><i class="fab fa-google"></i></a>
+                  <a href="#" class="social-icon twitter"><i class="fab fa-twitter"></i></a>
+                </div>
+              </div>
+              
+              <div class="login-footer">
+                <p class="text-muted">Pas encore membre? <a href="{{ path('app_auth') }}" class="text-primary fw-bold">Créer un compte</a></p>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="{{ asset('front/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ asset('front/smoothscroll/smooth-scroll.js') }}"></script>
+  <script src="{{ asset('front/dropdown/js/navbar-dropdown.js') }}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Animation au chargement
+      gsap.from(".login-card", {
+        duration: 0.8,
+        y: 50,
+        opacity: 0,
+        ease: "power3.out"
+      });
+      
+      // Toggle password visibility
+      const togglePassword = document.querySelector('#togglePassword');
+      if (togglePassword) {
+        togglePassword.addEventListener('click', function() {
+          const passwordField = document.querySelector('#inputPassword');
+          const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+          passwordField.setAttribute('type', type);
+          this.innerHTML = type === 'password' ? '<i class="far fa-eye"></i>' : '<i class="far fa-eye-slash"></i>';
+        });
+      }
+      
+      // Form submission animation
+      const form = document.getElementById('login-form');
+      if (form) {
+        form.addEventListener('submit', function() {
+          const submitBtn = this.querySelector('.btn-login');
+          const submitText = submitBtn.querySelector('.submit-text');
+          const spinner = submitBtn.querySelector('.spinner-border');
+          
+          submitText.textContent = 'Connexion en cours...';
+          spinner.classList.remove('d-none');
+          submitBtn.disabled = true;
+          
+          // Animation
+          gsap.to(submitBtn, {
+            scale: 0.98,
+            duration: 0.3,
+            ease: "power2.inOut"
+          });
+        });
+      }
+      
+      // Add hover effect to social icons
+      const socialIcons = document.querySelectorAll('.social-icon');
+      socialIcons.forEach(icon => {
+        icon.addEventListener('mouseenter', function() {
+          gsap.to(this, {
+            scale: 1.1,
+            duration: 0.2,
+            ease: "power2.out"
+          });
+        });
+        
+        icon.addEventListener('mouseleave', function() {
+          gsap.to(this, {
+            scale: 1,
+            duration: 0.2,
+            ease: "power2.out"
+          });
+        });
+      });
+    });
+  </script>
+</body>
+</html>

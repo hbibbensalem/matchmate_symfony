@@ -1,0 +1,305 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block title %}Dashboard Utilisateurs{% endblock %}
+{% block current_page %}Utilisateurs{% endblock %}
+{% block page_title %}Tableau des Utilisateurs{% endblock %}
+
+{% block main_content %}
+{% for message in app.flashes('success') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">                                                                                                                                                                                                                                                                                                                                               
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endfor %}
+
+{% for message in app.flashes('error') %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endfor %}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-0">Gestion des Utilisateurs</h5>
+                </div>
+                <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+                    <div class="input-group input-group-outline">
+                        <span class="input-group-text text-body"><i class="fas fa-search" aria-hidden="true"></i></span>
+                        <input type="text" id="searchInput" class="form-control" placeholder="Rechercher (nom, prénom ou email)...">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6>Liste des Utilisateurs</h6>
+                        <a href="{{ path('app_dashboard_user_new') }}" class="btn btn-sm btn-success">
+                            <i class="ni ni-fat-add"></i> Ajouter
+                        </a>
+                        <p class="text-sm mb-0">
+                            <i class="fa fa-users text-info"></i>
+                            <span class="font-weight-bold" id="userCount">{{ users|length }}</span> utilisateurs
+                        </p>
+                    </div>
+                </div>
+                <div class="card-body px-0 pt-0 pb-2">
+                    <div class="table-responsive p-0">
+                        <table class="table align-items-center mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">ID</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nom & Prénom</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Email</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Téléphone</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sexe</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Niveau</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Premium</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Photo</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Statut</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userTableBody">
+                                {% for user in users %}
+                                <tr class="user-row" data-search="{{ user.nomUser|lower }} {{ user.prenomUser|lower }} {{ user.emailUser|lower }}">
+                                    <td>
+                                        <div class="d-flex px-3 py-1">
+                                            <div class="d-flex flex-column justify-content-center">
+                                                <h6 class="mb-0 text-sm">{{ user.idUser }}</h6>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex px-2 py-1">
+                                            <div class="d-flex flex-column justify-content-center">
+                                                <h6 class="mb-0 text-sm">{{ user.nomUser }} {{ user.prenomUser }}</h6>
+                                                <p class="text-xs text-secondary mb-0">{{ user.adresseUser }}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <p class="text-xs font-weight-bold mb-0">{{ user.emailUser }}</p>
+                                        <p class="text-xs text-secondary mb-0">{{ user.role }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="text-xs font-weight-bold mb-0">{{ user.telephoneUser }}</p>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-sm bg-gradient-{{ user.sexeUser == 'Male' ? 'info' : 'danger' }}">
+                                            {{ user.sexeUser }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex flex-column">
+                                            <span class="text-xs font-weight-bold">{{ user.niveauJoueur }}</span>
+                                            <span class="text-xs text-secondary">Exp: {{ user.experience }}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-sm bg-gradient-{{ user.isPremium ? 'success' : 'secondary' }}">
+                                            {{ user.isPremium ? 'Oui' : 'Non' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="avatar-group">
+                                            {% if user.photoUser %}
+                                                <div class="avatar avatar-sm position-relative">
+                                                    <img src="{{ asset('uploads/' ~ user.photoUser) }}" 
+                                                         alt="Photo de profil" 
+                                                         class="border-radius-lg shadow"
+                                                         style="width: 40px; height: 40px; object-fit: cover;">
+                                                </div>
+                                            {% else %}
+                                                <div class="avatar avatar-sm bg-gradient-dark rounded-circle position-relative">
+                                                    <span class="avatar-text" style="font-size: 14px;">
+                                                        {{ user.nomUser|first|upper }}{{ user.prenomUser|first|upper }}
+                                                    </span>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-sm bg-gradient-{{ user.isActive ? 'success' : 'secondary' }}">
+                                            {{ user.isActive ? 'Actif' : 'Inactif' }}
+                                        </span>
+                                    </td>
+                                    <td class="align-middle">
+                                        <div class="d-flex">
+                                            <a href="{{ path('app_dashboard_user_edit', {'id': user.idUser}) }}" 
+                                               class="btn btn-sm btn-outline-info me-2" 
+                                               data-bs-toggle="tooltip" 
+                                               data-bs-placement="top" 
+                                               title="Modifier">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form method="post" action="{{ path('app_dashboard_user_toggle', {'id': user.idUser}) }}" class="toggle-form">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('toggle' ~ user.idUser) }}">
+                                                <button type="button" 
+                                                        class="btn btn-sm btn-{{ user.isActive ? 'danger' : 'success' }} toggle-btn"
+                                                        data-user-id="{{ user.idUser }}">
+                                                    <i class="fas fa-{{ user.isActive ? 'user-slash' : 'user-check' }}"></i>
+                                                    {{ user.isActive ? 'Désactiver' : 'Activer' }}
+                                                </button>
+                                                
+                                                {# Panneau de temporisation (caché par défaut) #}
+                                                <div class="deactivation-options mt-2" id="options-{{ user.idUser }}" style="display: none;">
+                                                    <div class="card card-body p-2">
+                                                        <div class="mb-2">
+                                                            <label class="form-label">Durée de désactivation</label>
+                                                            <div class="d-flex align-items-center">
+                                                                <input type="range" class="form-range duration-slider" 
+                                                                       min="1" max="60" step="1" value="2"
+                                                                       data-user-id="{{ user.idUser }}">
+                                                                <span class="ms-2 duration-value" id="duration-value-{{ user.idUser }}">2</span> minutes
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div class="form-check mb-2">
+                                                            <input class="form-check-input auto-reactivate" 
+                                                                   type="checkbox" 
+                                                                   id="auto-reactivate-{{ user.idUser }}"
+                                                                   data-user-id="{{ user.idUser }}" checked>
+                                                            <label class="form-check-label" for="auto-reactivate-{{ user.idUser }}">
+                                                                Réactiver automatiquement
+                                                            </label>
+                                                        </div>
+                                                        
+                                                        <div class="d-flex">
+                                                            <button type="submit" class="btn btn-sm btn-warning me-2 confirm-deactivation"
+                                                                    name="duration" value="2"
+                                                                    data-user-id="{{ user.idUser }}">
+                                                                <i class="fas fa-clock"></i> Confirmer
+                                                            </button>
+                                                            <button type="button" class="btn btn-sm btn-secondary cancel-deactivation"
+                                                                    data-user-id="{{ user.idUser }}">
+                                                                Annuler
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const userRows = document.querySelectorAll('.user-row');
+    const userCount = document.getElementById('userCount');
+
+    // Recherche
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase().trim(); // Convertir en minuscules et supprimer les espaces inutiles
+        let visibleCount = 0;
+
+        userRows.forEach(row => {
+            const searchData = row.getAttribute('data-search'); // Récupérer l'attribut data-search
+            if (searchData.includes(searchTerm)) {
+                row.style.display = ''; // Afficher la ligne si elle correspond
+                visibleCount++;
+            } else {
+                row.style.display = 'none'; // Masquer la ligne sinon
+            }
+        });
+
+        // Mettre à jour le compteur d'utilisateurs visibles
+        userCount.textContent = visibleCount;
+    });
+});
+document.querySelectorAll('.toggle-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const userId = this.dataset.userId;
+            const isActive = this.classList.contains('btn-danger');
+            
+            if (isActive) {
+                // Afficher les options de désactivation
+                document.getElementById(`options-${userId}`).style.display = 'block';
+            } else {
+                // Activer directement
+                this.closest('form').submit();
+            }
+        });
+    });
+
+    // Gestion des sliders de durée
+    document.querySelectorAll('.duration-slider').forEach(slider => {
+        const userId = slider.dataset.userId;
+        const valueDisplay = document.getElementById(`duration-value-${userId}`);
+        
+        slider.addEventListener('input', function() {
+            valueDisplay.textContent = this.value;
+            // Mettre à jour la valeur du bouton de confirmation
+            document.querySelector(`.confirm-deactivation[data-user-id="${userId}"]`).value = this.value;
+        });
+    });
+
+    // Annulation de la désactivation
+    document.querySelectorAll('.cancel-deactivation').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const userId = this.dataset.userId;
+            document.getElementById(`options-${userId}`).style.display = 'none';
+        });
+    });
+
+    setInterval(() => {
+    fetch("{{ path('app_check_reactivations') }}")
+        .then(response => response.json())
+        .then(data => {
+            if (data.reactivated > 0) {
+                // Recharger la page si des comptes ont été réactivés
+                location.reload();
+            }
+        });
+}, 60000);
+
+    // Gestion de la case à cocher "Réactiver automatiquement"
+    document.querySelectorAll('.auto-reactivate').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const userId = this.dataset.userId;
+            const confirmBtn = document.querySelector(`.confirm-deactivation[data-user-id="${userId}"]`);
+            
+            if (this.checked) {
+                confirmBtn.name = 'duration';
+                confirmBtn.innerHTML = '<i class="fas fa-clock"></i> Confirmer';
+            } else {
+                confirmBtn.name = 'permanent';
+                confirmBtn.innerHTML = '<i class="fas fa-user-slash"></i> Désactiver définitivement';
+            }
+        });
+    });
+
+    // Periodically check for reactivations every 30 seconds
+    setInterval(() => {
+        fetch("{{ path('app_check_reactivations') }}")
+            .then(response => response.json())
+            .then(data => {
+                if (data.reactivated > 0) {
+                    // Reload the page if any accounts were reactivated
+                    location.reload();
+                }
+            })
+            .catch(error => console.error('Error checking reactivations:', error));
+    }, 30000); // 30000ms = 30 seconds
+</script>
+{% endblock %}
+
+

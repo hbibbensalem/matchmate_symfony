@@ -1,0 +1,65 @@
+security:
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+        App\Entity\User: 'auto'  # Spécifique à votre entité User
+
+    providers:
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: 'email_user'  # Correspond à votre propriété email_user
+                # Si vous voulez utiliser le nom d'utilisateur à la place :
+                # property: 'id_user'  # Pour utiliser l'ID comme identifiant
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+            
+        main:
+            lazy: true
+            provider: app_user_provider
+            form_login:
+                login_path: app_login
+                check_path: app_login
+                username_parameter: 'email'  # Doit correspondre au name="" dans votre formulaire
+                password_parameter: 'password'  # Doit correspondre au name="" dans votre formulaire
+                enable_csrf: true
+                csrf_parameter: '_csrf_token'
+                csrf_token_id: 'authenticate'
+                default_target_path: app_login
+                always_use_default_target_path: false
+                target_path_parameter: '_target_path'
+                use_referer: false
+                failure_path: null
+                failure_forward: false
+                post_only: true
+            logout:
+                path: app_logout
+                target: app_login
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800  # 1 semaine en secondes
+                path: /
+                domain: null
+                secure: false
+                httponly: true
+                samesite: 'lax'
+                remember_me_parameter: '_remember_me'
+
+    access_control:
+        - { path: ^/login, roles: PUBLIC_ACCESS }
+        - { path: ^/register, roles: PUBLIC_ACCESS }
+        - { path: ^/reset-password, roles: PUBLIC_ACCESS }
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/profile, roles: ROLE_USER }
+        # Ajoutez d'autres règles selon vos besoins
+
+when@test:
+    security:
+        password_hashers:
+            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+                algorithm: auto
+                cost: 4
+                time_cost: 3
+                memory_cost: 10

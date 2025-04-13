@@ -1,0 +1,13 @@
+{# templates/form/custom_errors.html.twig #}
+{% block form_errors %}
+    {% if errors|length > 0 %}
+        <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+            <ul class="mb-0">
+                {% for error in errors %}
+                    <li>{{ error.message }}</li>
+                {% endfor %}
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endif %}
+{% endblock %}

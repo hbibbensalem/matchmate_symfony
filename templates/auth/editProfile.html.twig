@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Éditer le profil - MatchMate</title>
+  <link rel="shortcut icon" href="{{ asset('front/images/cree-un-logo-pour-un-site-web-de-sport-raquettes-sur-le-nom-matchmate-removebg-preview-1-260x147.png') }}" type="image/x-icon">
+  <link rel="stylesheet" href="{{ asset('front/bootstrap/css/bootstrap.min.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --primary-color: #10888D;
+      --primary-hover: #0E777D;
+      --secondary-color: #2C3E50;
+      --light-bg: #F8FAFC;
+      --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    
+    body {
+      font-family: 'Inter Tight', sans-serif;
+      background-color: var(--light-bg);
+      color: #333;
+    }
+    
+    .profile-container {
+      padding: 4rem 0;
+    }
+    
+    .profile-header {
+      background: linear-gradient(135deg, var(--primary-color), #0E777D);
+      padding: 2rem;
+      border-radius: 16px;
+      margin-bottom: 2rem;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--card-shadow);
+    }
+    
+    .profile-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('https://images.unsplash.com/photo-1552674605-db6ffd4facb5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') center/cover;
+      opacity: 0.2;
+      z-index: 0;
+    }
+    
+    .profile-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid white;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transition: var(--transition);
+    }
+    
+    .profile-avatar:hover {
+      transform: scale(1.05);
+    }
+    
+    .profile-name {
+      font-weight: 800;
+      color: white;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .profile-role {
+      color: rgba(255,255,255,0.9);
+      font-weight: 500;
+    }
+    
+    .profile-stats {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: var(--card-shadow);
+    }
+    
+    .stat-item {
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+    
+    .stat-label {
+      font-size: 0.85rem;
+      color: #64748B;
+    }
+    
+    .profile-card {
+      background: white;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    
+    .profile-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: linear-gradient(to bottom, var(--primary-color), #0E777D);
+    }
+    
+    .section-title {
+      font-weight: 700;
+      color: var(--secondary-color);
+      position: relative;
+      padding-bottom: 10px;
+      margin-bottom: 1.5rem;
+    }
+    
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 50px;
+      height: 3px;
+      background: var(--primary-color);
+      border-radius: 3px;
+    }
+    
+    .form-control {
+      border-radius: 10px;
+      padding: 12px 16px;
+      border: 2px solid #E2E8F0;
+      transition: var(--transition);
+    }
+    
+    .form-control:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(16, 136, 141, 0.2);
+    }
+    
+    .btn-save {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 24px;
+      font-weight: 600;
+      transition: var(--transition);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .btn-save:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-2px);
+    }
+    
+    .file-upload {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .file-upload-input {
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+    
+    .file-upload-label {
+      display: inline-block;
+      padding: 8px 16px;
+      background-color: #F1F5F9;
+      border-radius: 8px;
+      color: var(--secondary-color);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .file-upload-label:hover {
+      background-color: #E2E8F0;
+    }
+    
+    .social-links a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #F1F5F9;
+      color: var(--secondary-color);
+      margin-right: 10px;
+      transition: var(--transition);
+    }
+    
+    .social-links a:hover {
+      background-color: var(--primary-color);
+      color: white;
+      transform: translateY(-3px);
+    }
+    
+    .badge-premium {
+      background: linear-gradient(135deg, #FFD700, #FFA500);
+      color: #000;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 20px;
+      box-shadow: 0 3px 10px rgba(255, 215, 0, 0.3);
+    }
+    
+    @media (max-width: 768px) {
+      .profile-header {
+        text-align: center;
+      }
+      
+      .profile-stats {
+        margin-top: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="profile-container">
+  <div class="container">
+    <!-- Header Section -->
+    <div class="profile-header">
+      <div class="row align-items-center">
+        <div class="col-md-2 text-center text-md-start">
+          <img src="{{ asset('uploads/' ~ user.photoUser) }}" 
+               alt="Photo de profil" 
+               class="profile-avatar mb-3 mb-md-0">
+        </div>
+        <div class="col-md-6 text-center text-md-start">
+          <h2 class="profile-name">{{ user.prenomUser }} {{ user.nomUser }}</h2>
+          <p class="profile-role mb-2">
+            <i class="fas fa-user-tag me-2"></i>{{ user.role }}
+            {% if user.isPremium == '1' %}
+              <span class="badge-premium ms-2"><i class="fas fa-crown me-1"></i>PREMIUM</span>
+            {% endif %}
+          </p>
+          <div class="social-links mt-2">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="profile-stats">
+            <div class="row">
+              <div class="col-4 stat-item">
+                <div class="stat-value">24</div>
+                <div class="stat-label">Matchs</div>
+              </div>
+              <div class="col-4 stat-item">
+                <div class="stat-value">86%</div>
+                <div class="stat-label">Victoires</div>
+              </div>
+              <div class="col-4 stat-item">
+                <div class="stat-value">4.8</div>
+                <div class="stat-label">Note</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Edit Form Section -->
+    <div class="row">
+      <div class="col-lg-8">
+        <div class="profile-card">
+          <h4 class="section-title"><i class="fas fa-user-edit me-2"></i>Informations personnelles</h4>
+          
+          {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate', 'enctype': 'multipart/form-data'}}) }}
+            <div class="row mb-4">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  {{ form_label(form.prenom_user, 'Prénom', {'label_attr': {'class': 'form-label'}}) }}
+                  {{ form_widget(form.prenom_user, {'attr': {'class': 'form-control'}}) }}
+                  <div class="invalid-feedback">
+                    {{ form_errors(form.prenom_user) }}
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  {{ form_label(form.nom_user, 'Nom', {'label_attr': {'class': 'form-label'}}) }}
+                  {{ form_widget(form.nom_user, {'attr': {'class': 'form-control'}}) }}
+                  <div class="invalid-feedback">
+                    {{ form_errors(form.nom_user) }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="row mb-4">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  {{ form_label(form.email_user, 'Email', {'label_attr': {'class': 'form-label'}}) }}
+                  {{ form_widget(form.email_user, {'attr': {'class': 'form-control'}}) }}
+                  <div class="invalid-feedback">
+                    {{ form_errors(form.email_user) }}
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  {{ form_label(form.telephone_user, 'Téléphone', {'label_attr': {'class': 'form-label'}}) }}
+                  {{ form_widget(form.telephone_user, {'attr': {'class': 'form-control'}}) }}
+                  <div class="invalid-feedback">
+                    {{ form_errors(form.telephone_user) }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mb-4">
+              {{ form_label(form.date_naissance_user, 'Date de naissance', {'label_attr': {'class': 'form-label'}}) }}
+              {{ form_widget(form.date_naissance_user, {'attr': {'class': 'form-control'}}) }}
+              <div class="invalid-feedback">
+                {{ form_errors(form.date_naissance_user) }}
+              </div>
+            </div>
+            
+            <div class="mb-4">
+              {{ form_label(form.adresse_user, 'Adresse', {'label_attr': {'class': 'form-label'}}) }}
+              {{ form_widget(form.adresse_user, {'attr': {'class': 'form-control'}}) }}
+              <div class="invalid-feedback">
+                {{ form_errors(form.adresse_user) }}
+              </div>
+            </div>
+            
+            <div class="mb-4">
+              {{ form_label(form.description_user, 'Description', {'label_attr': {'class': 'form-label'}}) }}
+              {{ form_widget(form.description_user, {'attr': {'class': 'form-control', 'rows': 4}}) }}
+              <div class="invalid-feedback">
+                {{ form_errors(form.description_user) }}
+              </div>
+            </div>
+            
+            <div class="mb-4">
+                {{ form_label(form.photo_user, 'Photo de profil', {'label_attr': {'class': 'form-label'}}) }}
+                <div class="d-flex align-items-center">
+                    <div class="file-upload me-3">
+                        <button type="button" class="file-upload-label">
+                            <i class="fas fa-camera me-2"></i>Changer
+                            {{ form_widget(form.photo_user, {'attr': {'class': 'file-upload-input'}}) }}
+                        </button>
+                    </div>
+                    <small class="text-muted">Format JPG ou PNG, max 2MB</small>
+                </div>
+                {% if user.photoUser %}
+                    <small class="text-muted d-block mt-2">Actuelle: {{ user.photoUser }}</small>
+                {% endif %}
+                <div class="invalid-feedback">
+                    {{ form_errors(form.photo_user) }}
+                </div>
+            </div>
+            
+            <div class="mb-4">
+              {{ form_label(form.password_user, 'Nouveau mot de passe', {'label_attr': {'class': 'form-label'}}) }}
+              {{ form_widget(form.password_user, {'attr': {
+                'class': 'form-control',
+                'placeholder': 'Laissez vide pour ne pas changer'
+              }}) }}
+              <small class="text-muted">Minimum 6 caractères</small>
+              <div class="invalid-feedback">
+                {{ form_errors(form.password_user) }}
+              </div>
+            </div>
+            
+            <div class="mb-4">
+              {{ form_label(form.max_distance_user, 'Distance maximale (km)', {'label_attr': {'class': 'form-label'}}) }}
+              {{ form_widget(form.max_distance_user, {'attr': {'class': 'form-control'}}) }}
+              <div class="invalid-feedback">
+                {{ form_errors(form.max_distance_user) }}
+              </div>
+            </div>
+            
+            <button type="submit" class="btn btn-save mt-3">
+              <i class="fas fa-save me-2"></i>Enregistrer les modifications
+            </button>
+          {{ form_end(form) }}
+        </div>
+      </div>
+      
+      <div class="col-lg-4">
+        <!-- Preferences Section -->
+        <div class="profile-card mb-4">
+          <h4 class="section-title"><i class="fas fa-cog me-2"></i>Préférences</h4>
+          
+          <div class="mb-3">
+            <label class="form-label">Niveau de jeu</label>
+            <select class="form-select" disabled>
+              <option {{ user.niveauJoueur == 'DEBUTANT' ? 'selected' : '' }}>Débutant</option>
+              <option {{ user.niveauJoueur == 'INTERMEDIAIRE' ? 'selected' : '' }}>Intermédiaire</option>
+              <option {{ user.niveauJoueur == 'EXPERT' ? 'selected' : '' }}>Expert</option>
+            </select>
+            <small class="text-muted">Modifiable dans le formulaire principal</small>
+          </div>
+        </div>
+        
+        <!-- Security Section -->
+        <div class="profile-card">
+          <h4 class="section-title"><i class="fas fa-shield-alt me-2"></i>Sécurité</h4>
+          
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            Utilisez le formulaire principal pour changer votre mot de passe
+          </div>
+          
+          <hr class="my-4">
+          
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="mb-1">Connexion à deux facteurs</h6>
+              <small class="text-muted">Pour une sécurité renforcée</small>
+            </div>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" role="switch" disabled>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{{ asset('front/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Animation for file upload
+    const fileUploads = document.querySelectorAll('.file-upload-input');
+    fileUploads.forEach(input => {
+      input.addEventListener('change', function() {
+        const label = this.closest('.file-upload').querySelector('.file-upload-label');
+        if (this.files.length > 0) {
+          label.innerHTML = `<i class="fas fa-check me-2"></i>${this.files[0].name}`;
+          label.style.backgroundColor = '#E3F9F5';
+        } else {
+          label.innerHTML = '<i class="fas fa-camera me-2"></i>Changer';
+          label.style.backgroundColor = '#F1F5F9';
+        }
+      });
+    });
+    
+    // Profile avatar hover effect
+    const avatar = document.querySelector('.profile-avatar');
+    if (avatar) {
+      avatar.addEventListener('mouseenter', function() {
+        this.style.transform = 'scale(1.05)';
+        this.style.boxShadow = '0 8px 25px rgba(0,0,0,0.15)';
+      });
+      
+      avatar.addEventListener('mouseleave', function() {
+        this.style.transform = 'scale(1)';
+        this.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
+      });
+    }
+    
+    // Enable Bootstrap form validation
+    (function () {
+      'use strict'
+      
+      const forms = document.querySelectorAll('.needs-validation')
+      
+      Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+          if (!form.checkValidity()) {
+            event.preventDefault()
+            event.stopPropagation()
+          }
+          
+          form.classList.add('was-validated')
+        }, false)
+      })
+    })()
+  });
+</script>
+</body>
+</html>

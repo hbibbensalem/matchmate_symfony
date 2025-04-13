@@ -1,0 +1,134 @@
+{# templates/user/new.html.twig #}
+
+{% extends 'baseBack.html.twig' %}
+
+{% block title %}Ajouter un Utilisateur{% endblock %}
+
+{% block current_page %}Utilisateurs > Ajouter{% endblock %}
+{% block page_title %}Ajouter un nouvel Utilisateur{% endblock %}
+
+{% block main_content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header pb-0">
+                    <h6>Formulaire d'ajout</h6>
+                </div>
+                <div class="card-body px-4 pt-0 pb-2">
+                    {{ form_start(form, {'attr': {'class': 'row g-3'}}) }}
+                    
+                    <div class="col-md-6">
+                        {{ form_label(form.email_user, 'Email', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.email_user, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.email_user) }}
+                    </div>
+                    
+                    <div class="col-md-6">
+                        {{ form_label(form.password_user, 'Mot de passe', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.password_user, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.password_user) }}
+                    </div>
+                    
+                    <div class="col-md-6">
+                        {{ form_label(form.nom_user, 'Nom', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.nom_user, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.nom_user) }}
+                    </div>
+                    
+                    <div class="col-md-6">
+                        {{ form_label(form.prenom_user, 'Prénom', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.prenom_user, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.prenom_user) }}
+                    </div>
+                    
+                    <div class="col-md-6">
+                        {{ form_label(form.sexe_user, 'Sexe', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.sexe_user, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.sexe_user) }}
+                    </div>
+                    
+                    <div class="col-md-6">
+                        {{ form_label(form.telephone_user, 'Téléphone', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.telephone_user, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.telephone_user) }}
+                    </div>
+                    
+                    <div class="col-12">
+                        {{ form_label(form.adresse_user, 'Adresse', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.adresse_user, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.adresse_user) }}
+                    </div>
+                    
+                    <div class="col-md-6">
+                        {{ form_label(form.role, 'Rôle', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.role, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.role) }}
+                    </div>
+                    
+                    <div class="col-md-6">
+                        {{ form_label(form.experience, 'Expérience', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.experience, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.experience) }}
+                    </div>
+                    
+                    <div class="col-md-6">
+                        {{ form_label(form.niveau_joueur, 'Niveau du joueur', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.niveau_joueur, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.niveau_joueur) }}
+                    </div>
+                    
+                    <div class="col-md-6">
+                        {{ form_label(form.is_premium, 'Premium', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.is_premium, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.is_premium) }}
+                    </div>
+                    
+                    <div class="col-md-6">
+                        {{ form_label(form.date_naissance_user, 'Date de naissance', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.date_naissance_user, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.date_naissance_user) }}
+                    </div>
+                    
+                    <div class="col-md-6">
+                        {{ form_label(form.salaire, 'Salaire', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.salaire, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.salaire) }}
+                    </div>
+                    
+                    <div class="col-md-6">
+                        {{ form_label(form.max_distance_user, 'Distance maximale (km)', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.max_distance_user, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.max_distance_user) }}
+                    </div>
+                    
+                    <div class="col-md-6">
+                        {{ form_label(form.photo_user, 'Photo de profil', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.photo_user, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.photo_user) }}
+                    </div>
+                    
+                    <div class="col-md-6">
+                        {{ form_label(form.piece_jointe, 'Pièce jointe', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.piece_jointe, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.piece_jointe) }}
+                    </div>
+                    
+                    <div class="col-12">
+                        {{ form_label(form.description_user, 'Description', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.description_user, {'attr': {'class': 'form-control', 'rows': 3}}) }}
+                        {{ form_errors(form.description_user) }}
+                    </div>
+                    
+                    <div class="col-12 mt-4">
+                        <button type="submit" class="btn btn-primary">Ajouter</button>
+                        <a href="{{ path('app_dashboard_user') }}" class="btn btn-secondary">Annuler</a>
+                    </div>
+                    
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

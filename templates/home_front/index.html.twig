@@ -1,0 +1,37 @@
+{% extends 'baseFront.html.twig' %}
+
+{% block title %}Accueil - MatchMate{% endblock %}
+
+{% block content %}
+    <section data-bs-version="5.1" class="header16 cid-uBcQzsp0dJ mbr-fullscreen mbr-parallax-background" id="header17-1l">
+        <div class="mbr-overlay" style="opacity: 0.3; background-color: rgb(0, 0, 0);"></div>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="content-wrap col-12 col-md-12">
+                    <h1 class="mbr-section-title mbr-fonts-style mbr-white mb-4 display-1">
+                        <strong><br>Bienvenue sur MatchMate&nbsp;</strong><br><strong> Votre Partenaire Sportif Connecté</strong><strong><br></strong>
+                    </h1>
+                    <h2 class="mbr-section-subtitle mbr-fonts-style mbr-white mb-4 display-2"></h2>
+                    <p class="mbr-fonts-style mbr-text mbr-white mb-4 display-5">
+                        Rejoignez-nous dès aujourd'hui et découvrez une nouvelle façon de vivre le sport raquettes&nbsp;<br><br>
+                    </p>
+                    <div class="mbr-section-btn">
+                        {% if not app.user %}
+                            <a class="btn btn-warning display-7" href="{{ path('app_login') }}">
+                                <span class="mobi-mbri mobi-mbri-cursor-click mbr-iconfont mbr-iconfont-btn" style="color: rgb(255, 125, 25);"></span>Se connecter&nbsp;
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="display-7" style="padding: 0;align-items: center;justify-content: center;flex-wrap: wrap; align-content: center;display: flex;position: relative;height: 4rem;">
+        <a href="https://mobiri.se/" style="flex: 1 1;height: 4rem;position: absolute;width: 100%;z-index: 1;">
+            <img alt="" style="height: 4rem;" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==">
+        </a>
+        <p style="margin: 0;text-align: center;" class="display-7">&#8204;</p>
+        <a style="z-index:1" href="https://mobirise.com/html-builder.html"></a>
+    </section>
+{% endblock %}
