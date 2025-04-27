@@ -372,17 +372,7 @@
                 </div>
             </div>
             
-            <div class="mb-4">
-              {{ form_label(form.password_user, 'Nouveau mot de passe', {'label_attr': {'class': 'form-label'}}) }}
-              {{ form_widget(form.password_user, {'attr': {
-                'class': 'form-control',
-                'placeholder': 'Laissez vide pour ne pas changer'
-              }}) }}
-              <small class="text-muted">Minimum 6 caractères</small>
-              <div class="invalid-feedback">
-                {{ form_errors(form.password_user) }}
-              </div>
-            </div>
+       
             
             <div class="mb-4">
               {{ form_label(form.max_distance_user, 'Distance maximale (km)', {'label_attr': {'class': 'form-label'}}) }}
@@ -391,11 +381,11 @@
                 {{ form_errors(form.max_distance_user) }}
               </div>
             </div>
-            
+         
             <button type="submit" class="btn btn-save mt-3">
               <i class="fas fa-save me-2"></i>Enregistrer les modifications
             </button>
-          {{ form_end(form) }}
+       
         </div>
       </div>
       
@@ -404,24 +394,30 @@
         <div class="profile-card mb-4">
           <h4 class="section-title"><i class="fas fa-cog me-2"></i>Préférences</h4>
           
-          <div class="mb-3">
-            <label class="form-label">Niveau de jeu</label>
-            <select class="form-select" disabled>
-              <option {{ user.niveauJoueur == 'DEBUTANT' ? 'selected' : '' }}>Débutant</option>
-              <option {{ user.niveauJoueur == 'INTERMEDIAIRE' ? 'selected' : '' }}>Intermédiaire</option>
-              <option {{ user.niveauJoueur == 'EXPERT' ? 'selected' : '' }}>Expert</option>
-            </select>
-            <small class="text-muted">Modifiable dans le formulaire principal</small>
-          </div>
+          <div class="mb-4">
+            {{ form_label(form.niveau_joueur, 'Niveau de jeu', {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(form.niveau_joueur, {'attr': {'class': 'form-select'}}) }}
+            <div class="invalid-feedback">
+                {{ form_errors(form.niveau_joueur) }}
+            </div>
+        </div>
+          
         </div>
         
         <!-- Security Section -->
         <div class="profile-card">
           <h4 class="section-title"><i class="fas fa-shield-alt me-2"></i>Sécurité</h4>
           
-          <div class="alert alert-info">
-            <i class="fas fa-info-circle me-2"></i>
-            Utilisez le formulaire principal pour changer votre mot de passe
+          <div class="mb-4">
+            {{ form_label(form.password_user, 'Nouveau mot de passe', {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(form.password_user, {'attr': {
+              'class': 'form-control',
+              'placeholder': 'Laissez vide pour ne pas changer'
+            }}) }}
+            <small class="text-muted">Minimum 6 caractères</small>
+            <div class="invalid-feedback">
+              {{ form_errors(form.password_user) }}
+            </div>
           </div>
           
           <hr class="my-4">
@@ -432,18 +428,35 @@
               <small class="text-muted">Pour une sécurité renforcée</small>
             </div>
             <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" role="switch" disabled>
-            </div>
+              <input 
+                  class="form-check-input" 
+                  type="checkbox" 
+                  role="switch" 
+                  id="toggle2FA"
+                  {{ user.isTwoFactorEnabled ? 'checked' : '' }}  >
+          </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
-
+{{ form_end(form) }}
 <script src="{{ asset('front/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+
+
+    const toggle2FA = document.getElementById('toggle2FA');
+    const email2faField = document.getElementById('email2faField');
+
+
+    if (toggle2FA && email2faField) {
+        toggle2FA.addEventListener('change', function() {
+            // Affiche ou masque le champ email
+            email2faField.style.display = this.checked ? 'block' : 'none';
+        });
+    }
     // Animation for file upload
     const fileUploads = document.querySelectorAll('.file-upload-input');
     fileUploads.forEach(input => {

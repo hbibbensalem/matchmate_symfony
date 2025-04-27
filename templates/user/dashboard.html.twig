@@ -20,21 +20,102 @@
 {% endfor %}
 
 <div class="container-fluid py-4">
+    <!-- Section Nutritionnistes en attente -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h5 class="mb-0">Gestion des Utilisateurs</h5>
+            <div class="card">
+                <div class="card-header pb-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-0">Validation des Nutritionnistes</h5>
+                            <p class="text-sm mb-0">
+                                <i class="fas fa-user-md text-warning"></i>
+                                <span class="font-weight-bold">{{ pending_nutritionists|length }}</span> nutritionnistes en attente
+                            </p>
+                        </div>
+                    </div>
                 </div>
-                <div class="ms-md-auto pe-md-3 d-flex align-items-center">
-                    <div class="input-group input-group-outline">
-                        <span class="input-group-text text-body"><i class="fas fa-search" aria-hidden="true"></i></span>
-                        <input type="text" id="searchInput" class="form-control" placeholder="Rechercher (nom, prénom ou email)...">
+                <div class="card-body px-0 pt-0 pb-2">
+                    <div class="table-responsive p-0">
+                        <table class="table align-items-center mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nom & Prénom</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Email</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Diplôme</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date Inscription</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for nutritionist in pending_nutritionists %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex px-2 py-1">
+                                            <div>
+                                                {% if nutritionist.photoUser %}
+                                                    <img src="{{ asset('uploads/' ~ nutritionist.photoUser) }}" class="avatar avatar-sm me-3" alt="Photo">
+                                                {% else %}
+                                                    <div class="avatar avatar-sm bg-gradient-dark me-3 rounded-circle">
+                                                        <span class="avatar-text">{{ nutritionist.nomUser|first|upper }}{{ nutritionist.prenomUser|first|upper }}</span>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                            <div class="d-flex flex-column justify-content-center">
+                                                <h6 class="mb-0 text-sm">{{ nutritionist.nomUser }} {{ nutritionist.prenomUser }}</h6>
+                                                <p class="text-xs text-secondary mb-0">{{ nutritionist.telephoneUser }}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <p class="text-xs font-weight-bold mb-0">{{ nutritionist.emailUser }}</p>
+                                    </td>
+                                    <td>
+                                        <a href="{{ asset('uploads/' ~ nutritionist.pieceJointe) }}" 
+                                           target="_blank" 
+                                           class="btn btn-sm btn-outline-info">
+                                           <i class="fas fa-file-pdf me-1"></i> Voir diplôme
+                                        </a>
+                                    </td>
+                                    <td>
+                                    </td>
+                                    <td class="align-middle">
+                                        <div class="d-flex">
+                                            <form method="post" action="{{ path('admin_validate_nutritionist', {'id': nutritionist.idUser, 'action': 'approve'}) }}" class="me-2">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('validate_nutritionist_' ~ nutritionist.idUser) }}">
+                                                <button type="submit" class="btn btn-sm btn-success">
+                                                    <i class="fas fa-check-circle me-1"></i> Valider
+                                                </button>
+                                            </form>
+                                            <form method="post" action="{{ path('admin_validate_nutritionist', {'id': nutritionist.idUser, 'action': 'reject'}) }}">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('validate_nutritionist_' ~ nutritionist.idUser) }}">
+                                                <button type="submit" 
+                                                        class="btn btn-sm btn-danger"
+                                                        onclick="return confirm('Êtes-vous sûr de vouloir rejeter ce nutritionniste ? Cette action supprimera définitivement son compte.')">
+                                                    <i class="fas fa-times-circle me-1"></i> Rejeter
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4">
+                                        <div class="alert alert-info mb-0">
+                                            <i class="fas fa-info-circle me-2"></i> Aucun nutritionniste en attente de validation
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Section Tous les utilisateurs -->
     <div class="row">
         <div class="col-12">
             <div class="card mb-4">
@@ -49,6 +130,12 @@
                             <span class="font-weight-bold" id="userCount">{{ users|length }}</span> utilisateurs
                         </p>
                     </div>
+                    <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+                        <div class="input-group input-group-outline">
+                            <span class="input-group-text text-body"><i class="fas fa-search" aria-hidden="true"></i></span>
+                            <input type="text" id="searchInput" class="form-control" placeholder="Rechercher (nom, prénom ou email)...">
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">
                     <div class="table-responsive p-0">
@@ -59,8 +146,7 @@
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nom & Prénom</th>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Email</th>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Téléphone</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sexe</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Niveau</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Rôle</th>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Premium</th>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Photo</th>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Statut</th>
@@ -87,21 +173,14 @@
                                     </td>
                                     <td>
                                         <p class="text-xs font-weight-bold mb-0">{{ user.emailUser }}</p>
-                                        <p class="text-xs text-secondary mb-0">{{ user.role }}</p>
                                     </td>
                                     <td>
                                         <p class="text-xs font-weight-bold mb-0">{{ user.telephoneUser }}</p>
                                     </td>
                                     <td>
-                                        <span class="badge badge-sm bg-gradient-{{ user.sexeUser == 'Male' ? 'info' : 'danger' }}">
-                                            {{ user.sexeUser }}
+                                        <span class="badge badge-sm bg-gradient-{{ user.role == 'NUTRITIONIST' ? 'warning' : 'info' }}">
+                                            {{ user.role }}
                                         </span>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex flex-column">
-                                            <span class="text-xs font-weight-bold">{{ user.niveauJoueur }}</span>
-                                            <span class="text-xs text-secondary">Exp: {{ user.experience }}</span>
-                                        </div>
                                     </td>
                                     <td>
                                         <span class="badge badge-sm bg-gradient-{{ user.isPremium ? 'success' : 'secondary' }}">
@@ -146,10 +225,8 @@
                                                         class="btn btn-sm btn-{{ user.isActive ? 'danger' : 'success' }} toggle-btn"
                                                         data-user-id="{{ user.idUser }}">
                                                     <i class="fas fa-{{ user.isActive ? 'user-slash' : 'user-check' }}"></i>
-                                                    {{ user.isActive ? 'Désactiver' : 'Activer' }}
                                                 </button>
                                                 
-                                                {# Panneau de temporisation (caché par défaut) #}
                                                 <div class="deactivation-options mt-2" id="options-{{ user.idUser }}" style="display: none;">
                                                     <div class="card card-body p-2">
                                                         <div class="mb-2">
@@ -199,60 +276,58 @@
     </div>
 </div>
 {% endblock %}
+
 {% block javascripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Recherche dans le tableau principal
     const searchInput = document.getElementById('searchInput');
     const userRows = document.querySelectorAll('.user-row');
     const userCount = document.getElementById('userCount');
 
-    // Recherche
     searchInput.addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase().trim(); // Convertir en minuscules et supprimer les espaces inutiles
+        const searchTerm = this.value.toLowerCase().trim();
         let visibleCount = 0;
 
         userRows.forEach(row => {
-            const searchData = row.getAttribute('data-search'); // Récupérer l'attribut data-search
+            const searchData = row.getAttribute('data-search');
             if (searchData.includes(searchTerm)) {
-                row.style.display = ''; // Afficher la ligne si elle correspond
+                row.style.display = '';
                 visibleCount++;
             } else {
-                row.style.display = 'none'; // Masquer la ligne sinon
+                row.style.display = 'none';
             }
         });
 
-        // Mettre à jour le compteur d'utilisateurs visibles
         userCount.textContent = visibleCount;
     });
-});
-document.querySelectorAll('.toggle-btn').forEach(btn => {
+
+    // Gestion des boutons toggle
+    document.querySelectorAll('.toggle-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const userId = this.dataset.userId;
             const isActive = this.classList.contains('btn-danger');
             
             if (isActive) {
-                // Afficher les options de désactivation
                 document.getElementById(`options-${userId}`).style.display = 'block';
             } else {
-                // Activer directement
                 this.closest('form').submit();
             }
         });
     });
 
-    // Gestion des sliders de durée
+    // Sliders de durée
     document.querySelectorAll('.duration-slider').forEach(slider => {
         const userId = slider.dataset.userId;
         const valueDisplay = document.getElementById(`duration-value-${userId}`);
         
         slider.addEventListener('input', function() {
             valueDisplay.textContent = this.value;
-            // Mettre à jour la valeur du bouton de confirmation
             document.querySelector(`.confirm-deactivation[data-user-id="${userId}"]`).value = this.value;
         });
     });
 
-    // Annulation de la désactivation
+    // Annulation de désactivation
     document.querySelectorAll('.cancel-deactivation').forEach(btn => {
         btn.addEventListener('click', function() {
             const userId = this.dataset.userId;
@@ -260,18 +335,7 @@ document.querySelectorAll('.toggle-btn').forEach(btn => {
         });
     });
 
-    setInterval(() => {
-    fetch("{{ path('app_check_reactivations') }}")
-        .then(response => response.json())
-        .then(data => {
-            if (data.reactivated > 0) {
-                // Recharger la page si des comptes ont été réactivés
-                location.reload();
-            }
-        });
-}, 60000);
-
-    // Gestion de la case à cocher "Réactiver automatiquement"
+    // Case à cocher "Réactiver automatiquement"
     document.querySelectorAll('.auto-reactivate').forEach(checkbox => {
         checkbox.addEventListener('change', function() {
             const userId = this.dataset.userId;
@@ -287,19 +351,17 @@ document.querySelectorAll('.toggle-btn').forEach(btn => {
         });
     });
 
-    // Periodically check for reactivations every 30 seconds
+    // Vérification périodique des réactivations
     setInterval(() => {
         fetch("{{ path('app_check_reactivations') }}")
             .then(response => response.json())
             .then(data => {
                 if (data.reactivated > 0) {
-                    // Reload the page if any accounts were reactivated
                     location.reload();
                 }
             })
-            .catch(error => console.error('Error checking reactivations:', error));
-    }, 30000); // 30000ms = 30 seconds
+            .catch(error => console.error('Error:', error));
+    }, 30000);
+});
 </script>
 {% endblock %}
-
-

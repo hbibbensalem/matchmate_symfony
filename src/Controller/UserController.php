@@ -18,12 +18,15 @@ class UserController extends AbstractController
     #[Route('/dashboard/user', name: 'app_dashboard_user')]
     public function index(UserRepository $userRepository): Response
     {
-        // Données fictives - À remplacer par la récupération depuis votre base de données
+        // Récupérer tous les utilisateurs
         $users = $userRepository->findAll();
-        // Données fictives - À remplacer par la récupération depuis votre base de données
+
+        // Récupérer les nutritionnistes en attente de validation
+        $pendingNutritionists = $userRepository->findBy(['role' => 'NUTRITIONIST', 'isActive' => false]);
 
         return $this->render('user/dashboard.html.twig', [
             'users' => $users,
+            'pending_nutritionists' => $pendingNutritionists,
         ]);
         
 
@@ -161,7 +164,7 @@ class UserController extends AbstractController
 
         // UserController.php
 
-#[Route('/dashboard/user/toggle/{id}', name: 'app_dashboard_user_toggle', methods: ['POST', 'PUT'])]
+        #[Route('/dashboard/user/toggle/{id}', name: 'app_dashboard_user_toggle', methods: ['POST', 'PUT'])]
 public function toggleActive(Request $request, User $user, EntityManagerInterface $entityManager): Response
 {
     if ($this->isCsrfTokenValid('toggle'.$user->getIdUser(), $request->request->get('_token'))) {
@@ -269,5 +272,32 @@ public function checkReactivations(UserRepository $userRepository, EntityManager
     return $this->redirectToRoute('app_dashboard_user');
 }
 
+#[Route('/dashboard/user/validate/{id}/{action}', name: 'admin_validate_nutritionist', methods: ['POST'])]
+public function validateNutritionist(
+    Request $request,
+    User $user,
+    string $action,
+    EntityManagerInterface $entityManager
+): Response {
+    if (!$this->isCsrfTokenValid('validate_nutritionist_' . $user->getIdUser(), $request->request->get('_token'))) {
+        $this->addFlash('error', 'Token CSRF invalide.');
+        return $this->redirectToRoute('app_dashboard_user');
+    }
+
+    if ($action === 'approve') {
+        $user->setIsActive(true);
+        $user->setReactivateAt(null);
+        $this->addFlash('success', 'Nutritionniste validé avec succès.');
+    } elseif ($action === 'reject') {
+        $entityManager->remove($user);
+        $this->addFlash('success', 'Nutritionniste rejeté et supprimé avec succès.');
+    } else {
+        $this->addFlash('error', 'Action invalide.');
+        return $this->redirectToRoute('app_dashboard_user');
+    }
+
+    $entityManager->flush();
+    return $this->redirectToRoute('app_dashboard_user');
+}
 
 }

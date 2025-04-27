@@ -21,6 +21,8 @@ use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Validator\Constraints\File;
+use EWZ\Bundle\RecaptchaBundle\Form\Type\EWZRecaptchaType;
+use EWZ\Bundle\RecaptchaBundle\Validator\Constraints\IsTrue as RecaptchaTrue;
 
 class UserType extends AbstractType
 {
@@ -32,8 +34,8 @@ class UserType extends AbstractType
             ->add('email_user', EmailType::class, [
                 'label' => 'Email',
                 'constraints' => [
-                    new NotBlank(['message' => 'L\'email ne peut pas être vide']),
-                    new Length(['max' => 180]),
+                    new NotBlank(['message' => 'Veuillez entrer un email.']),
+                    new Length(['max' => 180, 'maxMessage' => 'L\'email ne peut pas dépasser {{ limit }} caractères.']),
                 ],
                 'attr' => ['class' => 'form-control']
             ])
@@ -41,14 +43,14 @@ class UserType extends AbstractType
                 'label' => 'Mot de passe',
                 'required' => !$isEdit,
                 'mapped' => false,
-                'constraints' => $isEdit ? [] : [
-                    new NotBlank(['message' => 'Le mot de passe est obligatoire']),
-                    new Length(['min' => 6, 'minMessage' => 'Le mot de passe doit contenir au moins {{ limit }} caractères']),
+                'constraints' => !$isEdit ? [
+                    new NotBlank(['message' => 'Veuillez entrer un mot de passe.']),
+                    new Length(['min' => 6, 'minMessage' => 'Le mot de passe doit contenir au moins {{ limit }} caractères.']),
                     new Regex([
                         'pattern' => '/\d/',
-                        'message' => 'Le mot de passe doit contenir au moins un chiffre'
+                        'message' => 'Le mot de passe doit contenir au moins un chiffre.'
                     ]),
-                ],
+                ] : [],
                 'attr' => [
                     'class' => 'form-control',
                     'autocomplete' => 'new-password'
@@ -57,16 +59,16 @@ class UserType extends AbstractType
             ->add('nom_user', TextType::class, [
                 'label' => 'Nom',
                 'constraints' => [
-                    new NotBlank(['message' => 'Le nom ne peut pas être vide']),
-                    new Length(['max' => 50]),
+                    new NotBlank(['message' => 'Veuillez entrer un nom.']),
+                    new Length(['max' => 50, 'maxMessage' => 'Le nom ne peut pas dépasser {{ limit }} caractères.']),
                 ],
                 'attr' => ['class' => 'form-control']
             ])
             ->add('prenom_user', TextType::class, [
                 'label' => 'Prénom',
                 'constraints' => [
-                    new NotBlank(['message' => 'Le prénom ne peut pas être vide']),
-                    new Length(['max' => 50]),
+                    new NotBlank(['message' => 'Veuillez entrer un prénom.']),
+                    new Length(['max' => 50, 'maxMessage' => 'Le prénom ne peut pas dépasser {{ limit }} caractères.']),
                 ],
                 'attr' => ['class' => 'form-control']
             ])
@@ -84,12 +86,12 @@ class UserType extends AbstractType
             ->add('telephone_user', TextType::class, [
                 'label' => 'Téléphone',
                 'constraints' => [
-                    new NotBlank(['message' => 'Le téléphone ne peut pas être vide']),
+                    new NotBlank(['message' => 'Veuillez entrer un numéro de téléphone.']),
                     new Regex([
                         'pattern' => '/^[259][0-9]*$/',
-                        'message' => 'Le téléphone doit commencer par 2, 5 ou 9'
+                        'message' => 'Le numéro doit commencer par 2, 5 ou 9.'
                     ]),
-                    new Length(['max' => 15]),
+                    new Length(['max' => 15, 'maxMessage' => 'Le numéro de téléphone ne peut pas dépasser {{ limit }} caractères.']),
                 ],
                 'attr' => ['class' => 'form-control']
             ])
@@ -104,22 +106,38 @@ class UserType extends AbstractType
                     new NotBlank(['message' => 'L\'adresse ne peut pas être vide']),
                     new Length(['max' => 255]),
                 ],
-                'attr' => ['class' => 'form-control']
+                'attr' => [
+                    'class' => 'form-control',
+                    'id' => 'address-input',
+                    'readonly' => true, // Empêche la modification manuelle
+                ]
             ])
             ->add('role', ChoiceType::class, [
-                'label' => 'Rôle',
+                'label' => false,
                 'choices' => [
                     'Joueur' => 'PLAYER',
                     'Nutritionniste' => 'NUTRITIONIST'
                 ],
                 'constraints' => [
-                    new NotBlank(['message' => 'Le rôle doit être sélectionné']),
+                    new NotBlank(['message' => 'Veuillez sélectionner un rôle']),
                 ],
-                'attr' => ['class' => 'form-control']
+                'attr' => [
+                    'class' => 'role-hidden-input',
+                    'data-card-selector' => 'role-card'
+                ],
+                'placeholder' => false,
+                'expanded' => false,
+                'multiple' => false,
             ])
             ->add('experience', ChoiceType::class, [
                 'label' => 'Expérience',
                 'required' => false,
+                'choices' => [
+                    'One Year' => 'One Year',
+                    'Two Years' => 'Two Years',
+                    'Three Years' => 'Three Years',
+                    'Four Years' => 'Four Years',
+                ],
                 'attr' => ['class' => 'form-control role-dependent role-nutritionist'],
             ])
             ->add('salaire', NumberType::class, [
@@ -130,6 +148,11 @@ class UserType extends AbstractType
             ->add('niveau_joueur', ChoiceType::class, [
                 'label' => 'Niveau du joueur',
                 'required' => false,
+                'choices' => [
+                    'Débutant' => 'DEBUTANT',
+                    'Intermédiaire' => 'INTERMEDIAIRE',
+                    'Expert' => 'EXPERT'
+                ],
                 'attr' => ['class' => 'form-control role-dependent role-player'],
             ])
             ->add('max_distance_user', NumberType::class, [
@@ -183,7 +206,16 @@ class UserType extends AbstractType
                     new NotBlank(['message' => 'La date de naissance ne peut pas être vide']),
                 ],
                 'attr' => ['class' => 'form-control']
+            ])
+            ->add('recaptcha', EWZRecaptchaType::class, [
+                'label' => false,
+                'mapped' => false,
+                'constraints' => [
+                    new RecaptchaTrue(),
+                ],
             ]);
+
+
 
         // Add transformers for file fields
 

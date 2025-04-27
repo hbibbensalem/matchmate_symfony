@@ -10,123 +10,199 @@ use App\Entity\User;
 use App\Form\UserType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use thiagoalessio\TesseractOCR\TesseractOCR;
 use App\Form\ProfileType;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use App\Service\FaceService;
+use App\Service\FileUploader;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+
 
 final class AuthController extends AbstractController
 {
     #[Route('/auth', name: 'app_auth')]
-    public function register(
-        Request $request,
-        EntityManagerInterface $entityManager,
-        UserPasswordHasherInterface $passwordHasher,
-    ): Response {
-        $user = new User();
-        $form = $this->createForm(UserType::class, $user);
-        $form->handleRequest($request);
+public function register(
+    Request $request,
+    EntityManagerInterface $entityManager,
+    UserPasswordHasherInterface $passwordHasher,
+    UserRepository $userRepository,
+    FileUploader $fileUploader
+): Response {
+    $user = new User();
+    $form = $this->createForm(UserType::class, $user);
+    $form->handleRequest($request);
 
+    if ($form->isSubmitted()) {
+        if ($form->isValid()) {
+            $role = $form->get('role')->getData();
+            $isNutritionist = ($role === 'NUTRITIONIST');
+            $diplomeValide = false;
 
+            // Traitement spécifique pour les nutritionnistes
+            if ($isNutritionist) {
+                $pieceJointeFile = $form->get('piece_jointe')->getData();
+                
+                if ($pieceJointeFile) {
+                    $newFilename = md5(uniqid().$pieceJointeFile->getClientOriginalName()).'.'.$pieceJointeFile->guessExtension();
+                    $destination = $this->getParameter('uploads_directory');
+                    $fullPath = $destination.'/'.$newFilename;
 
-        if ($form->isSubmitted()) {
-            if ($form->isValid()) {
+                    // Déplacer le fichier
+                    $pieceJointeFile->move($destination, $newFilename);
 
-                $role = $form->get('role')->getData();
-        
-                // Gérer les champs selon le rôle
-                if ($role === 'PLAYER') {
-                    $user->setExperience(null);
-                    $user->setSalaire(null);
-                } elseif ($role === 'NUTRITIONIST') {
-                    $user->setNiveauJoueur(null);
-                    $user->setIsPremium(null);
-                }
-                try {
-                    // Debugging: Log form data
-                    dump($user);
-
-                    // Ensure generateCustomId is called
-                    if (method_exists($user, 'generateCustomId')) {
-                        $user->generateCustomId();
-                    } else {
-                        throw new \Exception('generateCustomId method is missing in User entity.');
+                    if (!file_exists($fullPath)) {
+                        $this->addFlash('error', 'Erreur lors du téléchargement du fichier.');
+                        return $this->redirectToRoute('app_auth');
                     }
 
-                    // Handle photo upload
-                    $photoFile = $form->get('photo_user')->getData();
-                    if ($photoFile) {
-                        $newFilename = uniqid().'.'.$photoFile->guessExtension();
-                        $photoFile->move(
-                            $this->getParameter('uploads_directory'),
-                            $newFilename
-                        );
-                        $user->setPhotoUser($newFilename);
+                    // Analyse OCR
+                    $text = (new TesseractOCR($fullPath))
+                        ->lang('fra')
+                        ->psm(6)
+                        ->run();
+                    $text = strtolower(trim($text));
+
+                    // Vérification des mots-clés
+                    $motsCles = ['nutrition', 'nutritherapie', 'nutrithérapie'];
+                    $trouve = false;
+                    foreach ($motsCles as $mot) {
+                        if (str_contains($text, $mot)) {
+                            $trouve = true;
+                            break;
+                        }
                     }
 
-                    // Handle file upload
-                    $pieceJointeFile = $form->get('piece_jointe')->getData();
-                    if ($pieceJointeFile) {
-                        $newFilename = uniqid().'.'.$pieceJointeFile->guessExtension();
-                        $pieceJointeFile->move(
-                            $this->getParameter('uploads_directory'),
-                            $newFilename
-                        );
+                    if ($trouve) {
+                        $diplomeValide = true;
                         $user->setPieceJointe($newFilename);
+                    } else {
+                        unlink($fullPath);
+                        $this->addFlash('error', 'Diplôme non reconnu. ');
+                        return $this->redirectToRoute('app_auth');
                     }
+                } else {
+                    $this->addFlash('error', 'Un diplôme est requis pour les nutritionnistes.');
+                    return $this->redirectToRoute('app_auth');
+                }
+            }
 
-                    // Hash password
-                    $hashedPassword = $passwordHasher->hashPassword(
-                        $user,
-                        $form->get('password_user')->getData()
+            // Vérification email existant
+            $existingUser = $userRepository->findOneBy(['email_user' => $user->getEmailUser()]);
+            if ($existingUser) {
+                $this->addFlash('error', 'Cet email est déjà utilisé.');
+                return $this->render('auth/register.html.twig', [
+                    'form' => $form->createView(),
+                ]);
+            }
+
+            // Gestion des champs selon le rôle
+            if ($role === 'PLAYER') {
+                $user->setExperience(null);
+                $user->setSalaire(null);
+            } elseif ($role === 'NUTRITIONIST') {
+                $user->setNiveauJoueur(null);
+                $user->setIsPremium(null);
+            }
+
+            try {
+                // Génération de l'ID custom
+                if (method_exists($user, 'generateCustomId')) {
+                    $user->generateCustomId();
+                }
+
+                // Traitement de la photo webcam
+                $faceImageData = $request->request->get('face_image_data');
+                if ($faceImageData) {
+                    $faceImageName = $fileUploader->uploadBase64Image($faceImageData);
+                    $user->setFaceImage($faceImageName);
+                }
+
+                // Traitement photo utilisateur
+                $photoFile = $form->get('photo_user')->getData();
+                if ($photoFile) {
+                    $newFilename = md5(uniqid().$photoFile->getClientOriginalName()).'.'.$photoFile->guessExtension();
+                    $photoFile->move(
+                        $this->getParameter('uploads_directory'),
+                        $newFilename
                     );
-                    $user->setPasswordUser($hashedPassword);
-
-                    // Set default values
-                    $user->setIsActive(true);
-                    $user->setIsPremium('0');
-
-                    // Persist user
-                    $entityManager->persist($user);
-                    $entityManager->flush();
-
-                    $this->addFlash('success', 'Inscription réussie ! Vous pouvez maintenant vous connecter.');
-                    return $this->redirectToRoute('app_login');
-
-                } catch (\Exception $e) {
-                    $this->addFlash('error', 'Une erreur est survenue: '.$e->getMessage());
-                    dump($e->getMessage()); // Debugging: Log the exception
+                    $user->setPhotoUser($newFilename);
                 }
-            } else {
-                // Log validation errors
-                $errors = [];
-                foreach ($form->getErrors(true) as $error) {
-                    $errors[] = $error->getMessage();
+
+                // Hash password
+                $hashedPassword = $passwordHasher->hashPassword(
+                    $user,
+                    $form->get('password_user')->getData()
+                );
+                $user->setPasswordUser($hashedPassword);
+
+                // Définition du statut actif
+                $user->setIsActive(!$isNutritionist); // true pour players, false pour nutritionnistes
+                $user->setIsPremium(false);
+
+                // Persist user
+                $entityManager->persist($user);
+                $entityManager->flush();
+
+                // Message de succès différent selon le rôle
+                $this->addFlash(
+                    $isNutritionist ? 'warning' : 'success',
+                    $isNutritionist 
+                        ? 'Compte créé. En attente de validation par l\'administrateur.' 
+                        : 'Inscription réussie ! Vous pouvez maintenant vous connecter.'
+                );
+
+                // Redirection vers la page de connexion
+                return $this->redirectToRoute('app_login');
+
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Une erreur est survenue: '.$e->getMessage());
+                // Nettoyage des fichiers uploadés si erreur
+                if (isset($newFilename) && file_exists($destination.'/'.$newFilename)) {
+                    unlink($destination.'/'.$newFilename);
                 }
-                $this->addFlash('error', 'Le formulaire contient des erreurs: ' . implode(', ', $errors));
-                dump($errors); // Debugging: Log validation errors
             }
         } else {
-            $this->addFlash('error', 'Le formulaire n\'a pas été soumis correctement.');
-            dump('Form not submitted'); // Debugging: Log form submission status
+            $errors = [];
+            foreach ($form->getErrors(true) as $error) {
+                $errors[] = $error->getMessage();
+            }
+            $this->addFlash('error', 'Le formulaire contient des erreurs: '.implode(', ', $errors));
         }
-
-        return $this->render('auth/register.html.twig', [
-            'form' => $form->createView(),
-        ]);
     }
 
-    #[Route('/login', name: 'app_login')]
+    return $this->render('auth/register.html.twig', [
+        'form' => $form->createView(),
+    ]);
+}
+#[Route('/login', name: 'app_login')]
 public function login(AuthenticationUtils $authenticationUtils): Response
 {
     $user = $this->getUser();
 
     if ($user instanceof User) {
-        // Debug: Check the actual role value
-        dump($user->getRole()); // Should output "ADMIN", "PLAYER", etc.
+        if (!$user->isActive()) {
+            $this->container->get('security.token_storage')->setToken(null);
+            
+            $reactivateAt = $user->getReactivateAt();
+            $errorMessage = 'Votre compte est désactivé ';
+            
+            if ($reactivateAt instanceof \DateTimeInterface) {
+                // Format simple sans intl
+                $formattedDate = $reactivateAt->format('d/m/Y à H:i');
+                $errorMessage .= "jusqu'au ".$formattedDate;
+            } else {
+                $errorMessage .= "définitivement";
+            }
+            
+            $this->addFlash('error', $errorMessage);
+            return $this->redirectToRoute('app_login');
+        }
 
-        // Check if the role is 'ADMIN' (string comparison)
         if ($user->getRole() === 'ADMIN') {
             return $this->redirectToRoute('app_home_back');
         }

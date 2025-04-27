@@ -21,7 +21,8 @@
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter+Tight:100,200,300,400,500,600,700,800,900,100i,200i,300i,400i,500i,600i,700i,800i,900i&display=swap"></noscript>
   <link rel="preload" as="style" href="{{ asset('front/mobirise/css/mbr-additional.css?v=XG0ubR') }}"><link rel="stylesheet" href="{{ asset('front/mobirise/css/mbr-additional.css?v=XG0ubR') }}" type="text/css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     :root {
       --primary-color: #FF6B00;
@@ -364,27 +365,62 @@
         font-size: 2rem;
       }
       
-      .form-card {
-        padding: 1.5rem;
-      }
+      .role-card {
+    width: 120px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.role-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-color: #ced4da;
+}
+
+.role-card.active {
+    background: #e9f5ff;
+    border: 1px solid #0d6efd;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+}
+
+.role-card .card-body {
+    padding: 1rem 0.5rem;
+}
+
+.role-card .card-title {
+    font-size: 0.9rem;
+    color: #495057;
+}
+#piece-jointe-field {
+  display: none;
+}
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    {% for message in app.flashes('success') %}
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    {% endfor %}
-    {% for message in app.flashes('error') %}
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    {% endfor %}
-  </div>
+  {% for message in app.flashes('warning') %}
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endfor %}
+{% for message in app.flashes('success') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endfor %}
+{% for message in app.flashes('error') %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endfor %}
+  {% include '_flash_messages.html.twig' %}
   <section data-bs-version="5.1" class="form-container">
     <div class="container">
       <div class="row justify-content-center">
@@ -404,7 +440,17 @@
                 'method': 'POST',
                 'action': path('app_auth')
             }) }}
-            
+
+            {% if form.vars.errors|length > 0 %}
+                <div class="alert alert-danger">
+                    <ul>
+                        {% for error in form.vars.errors %}
+                            <li>{{ error.message }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
             <div class="row">
               <!-- Section Informations de base -->
               <div class="col-md-6">
@@ -415,12 +461,18 @@
                   <div class="form-group floating-label">
                     {{ form_widget(form.email_user, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
                     {{ form_label(form.email_user, 'Email', {'label_attr': {'class': 'form-label'}}) }}
+                    {% for error in form.email_user.vars.errors %}
+                        <div class="text-danger">{{ error.message }}</div>
+                    {% endfor %}
                     <div class="form-note">Nous ne partagerons jamais votre email</div>
                   </div>
                   
                   <div class="form-group floating-label">
                     {{ form_widget(form.password_user, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
                     {{ form_label(form.password_user, 'Mot de passe', {'label_attr': {'class': 'form-label'}}) }}
+                    {% for error in form.password_user.vars.errors %}
+                        <div class="text-danger">{{ error.message }}</div>
+                    {% endfor %}
                     <span class="password-toggle" id="togglePassword"><i class="far fa-eye"></i></span>
                     <div class="form-note">Minimum 6 caractères</div>
                   </div>
@@ -431,12 +483,18 @@
                       <div class="form-group floating-label">
                         {{ form_widget(form.nom_user, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
                         {{ form_label(form.nom_user, 'Nom', {'label_attr': {'class': 'form-label'}}) }}
+                        {% for error in form.nom_user.vars.errors %}
+                            <div class="text-danger">{{ error.message }}</div>
+                        {% endfor %}
                       </div>
                     </div>
                     <div class="col-md-6">
                       <div class="form-group floating-label">
                         {{ form_widget(form.prenom_user, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
                         {{ form_label(form.prenom_user, 'Prénom', {'label_attr': {'class': 'form-label'}}) }}
+                        {% for error in form.prenom_user.vars.errors %}
+                            <div class="text-danger">{{ error.message }}</div>
+                        {% endfor %}
                       </div>
                     </div>
                   </div>
@@ -446,12 +504,18 @@
                       <div class="form-group">
                         {{ form_label(form.sexe_user, 'Sexe', {'label_attr': {'class': 'form-label'}}) }}
                         {{ form_widget(form.sexe_user, {'attr': {'class': 'form-select'}}) }}
+                        {% for error in form.sexe_user.vars.errors %}
+                            <div class="text-danger">{{ error.message }}</div>
+                        {% endfor %}
                       </div>
                     </div>
                     <div class="col-md-6">
                       <div class="form-group floating-label">
                         {{ form_widget(form.date_naissance_user, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
                         {{ form_label(form.date_naissance_user, 'Date de naissance', {'label_attr': {'class': 'form-label'}}) }}
+                        {% for error in form.date_naissance_user.vars.errors %}
+                            <div class="text-danger">{{ error.message }}</div>
+                        {% endfor %}
                       </div>
                     </div>
                   </div>
@@ -467,125 +531,236 @@
                   <div class="form-group floating-label">
                     {{ form_widget(form.telephone_user, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
                     {{ form_label(form.telephone_user, 'Téléphone', {'label_attr': {'class': 'form-label'}}) }}
+                    {% for error in form.telephone_user.vars.errors %}
+                        <div class="text-danger">{{ error.message }}</div>
+                    {% endfor %}
                   </div>
                   
                   <div class="form-group floating-label">
-                    {{ form_widget(form.adresse_user, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
+                    {{ form_widget(form.adresse_user, {
+                      'attr': {
+                          'class': 'form-control address-field',
+                          'id': 'address-input',
+                          'readonly': true,
+                          'data-address-field': 'true'
+                      }
+                  }) }}
                     {{ form_label(form.adresse_user, 'Adresse', {'label_attr': {'class': 'form-label'}}) }}
-                  </div>
-                  
-                  <div class="row">
-                    <div class="col-md-6">
-                        <!-- Champ rôle -->
-                        <div class="form-group">
-                            {{ form_label(form.role, 'Rôle', {'label_attr': {'class': 'form-label'}}) }}
-                            {{ form_widget(form.role, {'attr': {'class': 'form-select'}}) }}
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                      <div class="form-group" id="player-fields" style="display: none;">
-                        {{ form_label(form.niveau_joueur, 'Niveau', {'label_attr': {'class': 'form-label'}}) }}
-                        {{ form_widget(form.niveau_joueur, {'attr': {'class': 'form-select'}}) }}
-                    </div>
-                    </div>
-                  </div>
-                  
-                  <div class="row">
-                    <div class="col-md-6">
-                      <!-- Champs pour NUTRITIONIST (initialement cachés) -->
-                      <div class="form-group" id="experience-field" style="display: none;">
-                          {{ form_label(form.experience, 'Expérience', {'label_attr': {'class': 'form-label'}}) }}
-                          {{ form_widget(form.experience, {'attr': {'class': 'form-select'}}) }}
-                      </div>
-                    </div>
-                    <div class="col-md-6">
-                      <div class="form-group floating-label">
-                        {{ form_widget(form.max_distance_user, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
-                        {{ form_label(form.max_distance_user, 'Distance max (km)', {'label_attr': {'class': 'form-label'}}) }}
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div class="form-group" id="salaire-field" style="display: none;">
-                    {{ form_label(form.salaire, 'Salaire', {'label_attr': {'class': 'form-label'}}) }}
-                    {{ form_widget(form.salaire, {'attr': {'class': 'form-control'}}) }}
+                    <button 
+                          type="button" 
+                          class="btn btn-primary mt-2" 
+                          id="open-map-btn" 
+                          data-bs-toggle="offcanvas" 
+                          data-bs-target="#mapModal">
+                          Sélectionner sur la carte
+                      </button>
+
+                    {% for error in form.adresse_user.vars.errors %}
+                        <div class="text-danger">{{ error.message }}</div>
+                    {% endfor %}
                 </div>
-                  <div class="form-group" id="premium-field" style="display: none;">
-                    {{ form_label(form.is_premium, 'Premium', {'label_attr': {'class': 'form-label'}}) }}
-                    {{ form_widget(form.is_premium, {'attr': {'class': 'form-select'}}) }}
-                </div>
-                </div>
-              </div>
-              
-              <!-- Section Fichiers -->
-              <div class="col-12">
-                <div class="form-section">
-                  <h5><i class="fas fa-images me-2"></i>Photos et documents</h5>
-                  <hr>
-                  
-                  <div class="row align-items-center mb-4">
-                    <div class="col-md-4">
-                        <img id="photoPreview" class="form-image-preview" src="" alt="Aperçu photo">
-                        <div class="file-upload-wrapper">
-                            <label class="file-upload-label">
-                                <i class="fas fa-camera me-2"></i>
-                                <span id="photoLabel">Choisir une photo</span>
-                                {{ form_widget(form.photo_user, {'attr': {'class': 'file-upload-input'}}) }}
-                            </label>
-                            <div class="progress-container">
-                                <div class="progress-bar"></div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-8">
-                      <div class="form-group floating-label">
-                        {{ form_widget(form.description_user, {'attr': {'class': 'form-control', 'placeholder': ' ', 'rows': 4}}) }}
-                        {{ form_label(form.description_user, 'Décrivez-vous en quelques mots', {'label_attr': {'class': 'form-label'}}) }}
-                      </div>
-                    </div>
+                                  
+                <div class="offcanvas offcanvas-end" tabindex="-1" id="mapModal">
+                  <div class="offcanvas-header">
+                    <h5 class="offcanvas-title">Sélectionner une adresse</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
                   </div>
-                  
-                  <div class="file-upload-wrapper">
-                    <label class="file-upload-label">
-                        <i class="fas fa-file-upload me-2"></i>
-                        <span id="pieceJointeLabel">Ajouter une pièce jointe (optionnel)</span>
-                        {{ form_widget(form.piece_jointe, {'attr': {'class': 'file-upload-input'}}) }}
-                    </label>
-                    <div class="progress-container">
-                        <div class="progress-bar"></div>
-                    </div>
+                  <div class="offcanvas-body">
+                    <div id="map" style="height: 400px;"></div>
+                    <button class="btn btn-success mt-3" id="confirm-location">Confirmer l'adresse</button>
+                  </div>
                 </div>
                 
-              <!-- Conditions et soumission -->
-              <div class="col-12">
-                <div class="form-check mb-4">
-                  <input class="form-check-input" type="checkbox" id="termsCheck" required>
-                  <label class="form-check-label" for="termsCheck">
-                    J'accepte les <a href="#" class="text-primary">conditions d'utilisation</a> et la <a href="#" class="text-primary">politique de confidentialité</a>
-                  </label>
-                </div>
                 
-                <div class="d-grid">
-                  <button type="submit" class="btn btn-submit btn-lg">
-                    <span class="submit-text">S'inscrire maintenant</span>
-                    <span class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
-                  </button>
-                </div>
                 
-                <div class="text-center mt-3">
-                  <p class="text-muted">Déjà membre? <a href="{{ path('app_login') }}" class="text-primary fw-bold">Connectez-vous</a></p>
+                  
+                  {# Store the form field ONCE at the beginning #}
+{% set roleField = form_widget(form.role, {'attr': {'class': 'd-none'}}) %}
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <label class="form-label mb-3 d-block">Choisissez votre rôle <span class="text-danger">*</span></label>
+        <div class="d-flex justify-content-center gap-3">
+            <!-- Joueur Card -->
+            <div class="role-card" data-role-value="PLAYER">
+                <div class="card-body text-center p-3">
+                    <img src="{{ asset('back/img/tennis-player.png') }}" alt="Joueur" class="mb-2" style="width: 40px; height: 40px;">
+                    <h6 class="card-title mb-0" style="font-weight: 600;">Joueur</h6>
                 </div>
-              </div>
             </div>
             
-            {{ form_end(form) }}
+            <!-- Nutritionniste Card -->
+            <div class="role-card" data-role-value="NUTRITIONIST">
+                <div class="card-body text-center p-3">
+                    <img src="{{ asset('back/img/nutritionniste.png') }}" alt="Nutritionniste" class="mb-2" style="width: 40px; height: 40px;">
+                    <h6 class="card-title mb-0" style="font-weight: 600;">Nutritionniste</h6>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Output the stored form field ONLY ONCE -->
+        {{ roleField|raw }}
+        
+        <!-- Error display -->
+        <div class="invalid-feedback d-block">
+            {{ form_errors(form.role) }}
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group" id="player-fields" style="display: none;">
+            {{ form_label(form.niveau_joueur, 'Niveau', {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(form.niveau_joueur, {'attr': {'class': 'form-select'}}) }}
+            {% for error in form.niveau_joueur.vars.errors %}
+                <div class="text-danger">{{ error.message }}</div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="col-md-6">
+        <!-- Champs pour NUTRITIONIST (initialement cachés) -->
+        <div class="form-group" id="experience-field" style="display: none;">
+            {{ form_label(form.experience, 'Expérience', {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(form.experience, {'attr': {'class': 'form-select'}}) }}
+            {% for error in form.experience.vars.errors %}
+                <div class="text-danger">{{ error.message }}</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group floating-label">
+            {{ form_widget(form.max_distance_user, {'attr': {'class': 'form-control', 'placeholder': ' '}}) }}
+            {{ form_label(form.max_distance_user, 'Distance max (km)', {'label_attr': {'class': 'form-label'}}) }}
+            {% for error in form.max_distance_user.vars.errors %}
+                <div class="text-danger">{{ error.message }}</div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group" id="salaire-field" style="display: none;">
+            {{ form_label(form.salaire, 'Salaire', {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(form.salaire, {'attr': {'class': 'form-control'}}) }}
+            {% for error in form.salaire.vars.errors %}
+                <div class="text-danger">{{ error.message }}</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="form-group" id="premium-field" style="display: none;">
+    {{ form_label(form.is_premium, 'Premium', {'label_attr': {'class': 'form-label'}}) }}
+    {{ form_widget(form.is_premium, {'attr': {'class': 'form-select'}}) }}
+    {% for error in form.is_premium.vars.errors %}
+        <div class="text-danger">{{ error.message }}</div>
+    {% endfor %}
+</div>
+</div> <!-- Fermeture de la div col-md-6 (Informations supplémentaires) -->
+</div>
+
+              
+<div class="row">
+  <div class="col-12">
+    <div class="form-section">
+      <h5><i class="fas fa-images me-2"></i>Photos et documents</h5>
+      <hr>
+      
+      <div class="row align-items-center mb-4">
+        <div class="col-md-4">
+            <img id="photoPreview" class="form-image-preview" src="" alt="Aperçu photo">
+            <div class="file-upload-wrapper">
+                <label class="file-upload-label">
+                    <i class="fas fa-camera me-2"></i>
+                    <span id="photoLabel">Choisir une photo</span>
+                    {{ form_widget(form.photo_user, {'attr': {'class': 'file-upload-input'}}) }}
+                </label>
+                <div class="progress-container">
+                    <div class="progress-bar"></div>
+                </div>
+            </div>
+            {% for error in form.photo_user.vars.errors %}
+                <div class="text-danger">{{ error.message }}</div>
+            {% endfor %}
+        </div>
+        
+        <div class="col-md-8">
+          <div class="form-group floating-label">
+            {{ form_widget(form.description_user, {'attr': {'class': 'form-control', 'placeholder': ' ', 'rows': 4}}) }}
+            {{ form_label(form.description_user, 'Décrivez-vous en quelques mots', {'label_attr': {'class': 'form-label'}}) }}
+            {% for error in form.description_user.vars.errors %}
+                <div class="text-danger">{{ error.message }}</div>
+            {% endfor %}
           </div>
         </div>
       </div>
+      
+      <div class="file-upload-wrapper" id="piece-jointe-field" style="display: none;">
+        <label class="file-upload-label">
+            <i class="fas fa-file-upload me-2"></i>
+            <span id="pieceJointeLabel">Ajouter une pièce jointe (optionnel)</span>
+            {{ form_widget(form.piece_jointe, {'attr': {'class': 'file-upload-input'}}) }}
+        </label>
+        <div class="progress-container" >
+            <div class="progress-bar"></div>
+        </div>
+        {% for error in form.piece_jointe.vars.errors %}
+            <div class="text-danger">{{ error.message }}</div>
+        {% endfor %}
+      </div>
     </div>
-  </section>
+  </div>
+</div>
 
+<div class="form-section">
+  <h5><i class="fas fa-camera me-2"></i>Photo via Webcam</h5>
+  <hr>
+  <div style="text-align: center;">
+    <video id="video" width="320" height="240" autoplay></video>
+    <br>
+    <button type="button" id="snap" class="btn btn-primary mt-3">📸 Prendre une photo</button>
+    <canvas id="canvas" width="320" height="240" style="display: none;"></canvas>
+    <input type="hidden" name="face_image_data" id="face_image_data">
+  </div>
+</div>
+<div class="form-section">
+  <h5><i class="fas fa-shield-alt me-2"></i>Vérification</h5>
+  <hr>
+  {{ form_widget(form.recaptcha) }}  {# Only render the widget #}
+</div>
+          <!-- Conditions et soumission - Reste dans la même row pleine largeur -->
+          <div class="row">
+            <div class="col-12">
+              <div class="form-check mb-4">
+                <input class="form-check-input" type="checkbox" id="termsCheck" required>
+                <label class="form-check-label" for="termsCheck">
+                  J'accepte les <a href="#" class="text-primary">conditions d'utilisation</a> et la <a href="#" class="text-primary">politique de confidentialité</a>
+                </label>
+              </div>
+              
+              <div class="d-grid">
+                <button type="submit" class="btn btn-submit btn-lg">
+                  <span class="submit-text">S'inscrire maintenant</span>
+                  <span class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
+                </button>
+              </div>
+              
+              <div class="text-center mt-3">
+                <p class="text-muted">Déjà membre? <a href="{{ path('app_login') }}" class="text-primary fw-bold">Connectez-vous</a></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {{ form_end(form) }}
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</section>
   <script src="{{ asset('front/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
   <script src="{{ asset('front/smoothscroll/smooth-scroll.js') }}"></script>
   <script src="{{ asset('front/dropdown/js/navbar-dropdown.js') }}"></script>
@@ -594,81 +769,72 @@
   <script>
     document.addEventListener('DOMContentLoaded', function() {
 
-      const roleSelector = document.querySelector('.role-selector');
-      if (roleSelector) {
-        roleSelector.addEventListener('change', function() {
-            toggleFields();
-        });
-    }
-    
-    // Initialisez les champs au chargement
-    toggleFields();
+      const roleCards = document.querySelectorAll('.role-card');
+      const roleInput = document.getElementById('{{ form.role.vars.id }}');
+      const playerFields = document.getElementById('player-fields');
+      const experienceField = document.getElementById('experience-field');
+      const pieceJointeField = document.getElementById('piece-jointe-field');
+      const salaireField = document.getElementById('salaire-field');
+      const premiumField = document.getElementById('premium-field');
+
+
+      const openMapBtn = document.getElementById('open-map-btn');
+      const addressInput = document.getElementById('address-input');
+      const mapModalElement = document.getElementById('mapModal'); // Il manquait cette ligne !!!
+      const mapModal = new bootstrap.Offcanvas(mapModalElement);
 
 
 
-    function toggleFields() {
-        const role = document.querySelector('#{{ form.role.vars.id }}').value;
-        
-        // Champs PLAYER
-        const playerFields = document.querySelectorAll('#player-fields, #premium-field');
-        // Champs NUTRITIONIST
-        const nutritionistFields = document.querySelectorAll('#experience-field, #salaire-field');
-        
-        // Masquer tous les champs d'abord
-        playerFields.forEach(field => field.style.display = 'none');
-        nutritionistFields.forEach(field => field.style.display = 'none');
-        
-        // Afficher les champs selon le rôle
-        if (role === 'PLAYER') {
-            playerFields.forEach(field => {
-                field.style.display = 'block';
-                gsap.from(field, {duration: 0.3, opacity: 0, y: 10});
-            });
-        } else if (role === 'NUTRITIONIST') {
-            nutritionistFields.forEach(field => {
-                field.style.display = 'block';
-                gsap.from(field, {duration: 0.3, opacity: 0, y: 10});
-            });
-        }
-    }
+    
+        let map = null;
+        let marker = null;
+        let selectedLocation = null;
 
-    document.querySelector('#{{ form.role.vars.id }}').addEventListener('change', toggleFields);
-    
-    // Initialiser l'état des champs au chargement
-    toggleFields();
-    
-    // Écouter les changements du rôle
-    document.querySelector('#{{ form.role.vars.id }}').addEventListener('change', toggleFields);
-    
-    // Animation pour l'apparition des champs
-    function animateFields(fields) {
-        gsap.from(fields, {
-            duration: 0.5,
-            opacity: 0,
-            y: 20,
-            stagger: 0.1,
-            ease: "power2.out"
-        });
-    }
-      // Animation au chargement
-      gsap.from(".form-card", {
-        duration: 0.8,
-        y: 50,
-        opacity: 0,
-        ease: "power3.out"
+      
+
+      // Handle card clicks
+      roleCards.forEach(card => {
+          card.addEventListener('click', function() {
+              roleCards.forEach(c => c.classList.remove('active'));
+              this.classList.add('active');
+              
+              const role = this.getAttribute('data-role-value');
+              roleInput.value = role;
+              
+              // Toggle fields based on role
+              if (role === 'PLAYER') {
+                  playerFields.style.display = 'block';
+                  experienceField.style.display = 'none';
+                  pieceJointeField.style.display = 'none';
+                  salaireField.style.display = 'none';
+                  premiumField.style.display = 'block';
+              } else if (role === 'NUTRITIONIST') {
+                  playerFields.style.display = 'none';
+                  experienceField.style.display = 'block';
+                  salaireField.style.display = 'block';
+                  pieceJointeField.style.display = 'block';
+                  premiumField.style.display = 'none';
+              }
+              
+              // Clear validation errors
+              roleInput.classList.remove('is-invalid');
+          });
       });
       
-      // Toggle password visibility
-      const togglePassword = document.querySelector('#togglePassword');
-      if (togglePassword) {
-        togglePassword.addEventListener('click', function() {
-          const passwordField = document.querySelector('#{{ form.password_user.vars.id }}');
-          const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
-          passwordField.setAttribute('type', type);
-          this.innerHTML = type === 'password' ? '<i class="far fa-eye"></i>' : '<i class="far fa-eye-slash"></i>';
-        });
+      // Initialize selection if returning to form with errors
+      if (roleInput.value) {
+          document.querySelector(`.role-card[data-role-value="${roleInput.value}"]`)?.classList.add('active');
+          
+          if (roleInput.value === 'PLAYER') {
+              playerFields.style.display = 'block';
+              premiumField.style.display = 'block';
+          } else if (roleInput.value === 'NUTRITIONIST') {
+              experienceField.style.display = 'block';
+              salaireField.style.display = 'block';
+              pieceJointeField.style.display = 'block';
+          }
       }
-      
+
       // Photo preview
       const photoInput = document.querySelector('#{{ form.photo_user.vars.id }}');
       const photoPreview = document.getElementById('photoPreview');
@@ -735,7 +901,18 @@
           }
         });
       }
-      
+
+      // Toggle password visibility
+      const togglePassword = document.querySelector('#togglePassword');
+      if (togglePassword) {
+        togglePassword.addEventListener('click', function() {
+          const passwordField = document.querySelector('#{{ form.password_user.vars.id }}');
+          const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+          passwordField.setAttribute('type', type);
+          this.innerHTML = type === 'password' ? '<i class="far fa-eye"></i>' : '<i class="far fa-eye-slash"></i>';
+        });
+      }
+
       // Form submission animation
       const form = document.getElementById('register-form');
       if (form) {
@@ -793,7 +970,99 @@
           });
         });
       });
+
+      const video = document.getElementById('video');
+  const canvas = document.getElementById('canvas');
+  const snap = document.getElementById('snap');
+  const faceImageData = document.getElementById('face_image_data');
+  
+  // Accéder à la webcam
+  navigator.mediaDevices.getUserMedia({ video: true })
+    .then(function(stream) {
+      video.srcObject = stream;
+    })
+    .catch(function(err) {
+      console.error("Erreur d'accès à la webcam: ", err);
     });
-  </script>
+  
+  // Prendre une photo
+  snap.addEventListener('click', function() {
+    const context = canvas.getContext('2d');
+    context.drawImage(video, 0, 0, 320, 240);
+    
+    // Convertir l'image en base64
+    const imageData = canvas.toDataURL('image/jpeg', 0.8); // Format JPEG avec 80% qualité
+    faceImageData.value = imageData;
+    
+    console.log("Photo prise et stockée dans le champ caché");
+  });
+
+  document.getElementById('mapModal').addEventListener('shown.bs.offcanvas', function () {
+    initMap();
+    setTimeout(() => {
+        if (map) map.invalidateSize();
+    }, 200);
+});
+
+function initMap() {
+    if (map) return;
+
+    map = L.map('map').setView([34, 9], 7);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    map.on('click', async function(e) {
+    if (marker) map.removeLayer(marker);
+    marker = L.marker(e.latlng).addTo(map).bindPopup("Adresse sélectionnée").openPopup();
+    
+    try {
+        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${e.latlng.lat}&lon=${e.latlng.lng}&accept-language=fr`);
+        const data = await response.json();
+        selectedLocation = {
+            address: data.display_name || "Adresse non spécifiée",
+            lat: e.latlng.lat,
+            lng: e.latlng.lng
+        };
+        console.log("Adresse sélectionnée :", selectedLocation.address); // Debug
+    } catch (error) {
+        console.error("Erreur de géocodage :", error);
+    }
+});
+}
+
+// Bouton "Confirmer l'adresse"
+document.getElementById('confirm-location').addEventListener('click', function() {
+    // Essayez d'abord avec l'ID exact, puis avec d'autres sélecteurs
+    const addressInput = document.getElementById('address-input') || 
+                       document.querySelector('[name="address"]') ||
+                       document.querySelector('input[readonly]');
+    
+    console.log('Element trouvé:', addressInput); // Debug
+    
+    if (!addressInput) {
+        console.error('Aucun champ adresse trouvé. Voici les IDs disponibles:');
+        console.log(document.querySelectorAll('input')); // Liste tous les inputs
+        return;
+    }
+
+    if (selectedLocation?.address) {
+        addressInput.value = selectedLocation.address;
+        console.log('Valeur définie:', addressInput.value); // Vérifiez
+        bootstrap.Offcanvas.getInstance(document.getElementById('mapModal')).hide();
+    } else {
+        alert("Veuillez sélectionner une adresse");
+    }
+});
+
+});
+</script>
+
+  {% if app.session.get('ocr_text') %}
+    <script>
+        console.log("Texte OCR : {{ app.session.get('ocr_text')|e('js') }}");
+    </script>
+  {% endif %}
 </body>
 </html>

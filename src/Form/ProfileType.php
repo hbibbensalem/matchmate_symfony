@@ -57,7 +57,7 @@ class ProfileType extends AbstractType
                 'required' => false,
                 'constraints' => [
                     new File([
-                        'maxSize' => '2M',
+                        'maxSize' => '5M',
                         'mimeTypes' => ['image/jpeg', 'image/png'],
                     ])
                 ]
@@ -71,7 +71,6 @@ class ProfileType extends AbstractType
                 ],
                 'attr' => ['class' => 'form-select']
             ])
-            
             ->add('max_distance_user', NumberType::class, [
                 'label' => 'Distance maximale (km)',
                 'required' => false,
@@ -79,22 +78,8 @@ class ProfileType extends AbstractType
                     'class' => 'form-control',
                     'min' => 0
                 ]
-            ])
-            
-                    ->add('photo_user', FileType::class, [
-                        'label' => 'Photo de profil',
-                        'required' => false,
-                        'mapped' => false, // Important pour les fichiers
-                        'constraints' => [
-                            new File([
-                                'maxSize' => '2M',
-                                'mimeTypes' => ['image/jpeg', 'image/png'],
-                                'mimeTypesMessage' => 'Veuillez uploader une image valide (JPEG ou PNG)',
-                            ])
-                        ]
-                    ]);
-            }
-        
+            ]);
+    }
 
     public function configureOptions(OptionsResolver $resolver)
     {

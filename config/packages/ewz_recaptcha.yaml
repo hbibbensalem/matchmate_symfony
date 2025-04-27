@@ -1,0 +1,6 @@
+# config/packages/ewz_recaptcha.yaml
+ewz_recaptcha:
+    public_key: '%env(RECAPTCHA_SITE_KEY)%'
+    private_key: '%env(RECAPTCHA_SECRET_KEY)%'
+    enabled: true
+    locale_key: 'fr'

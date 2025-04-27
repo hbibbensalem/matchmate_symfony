@@ -84,79 +84,95 @@ public function generateCustomId(): void
 
 
     #[ORM\Column(type: "string", length: 255)]
-    private string $email_user;
+    private ?string $email_user;
 
     #[ORM\Column(type: "string", length: 255)]
-    private string $password_user;
+    private ?string $password_user;
 
     #[ORM\Column(type: "string", length: 255)]
-    private string $nom_user;
+    private ?string $nom_user;
 
     #[ORM\Column(type: "string", length: 255)]
-    private string $prenom_user;
+    private ?string $prenom_user;
 
     #[ORM\Column(type: "string", length: 255)]
-    private string $sexe_user = 'M'; // Default value added
+    private ?string $sexe_user = 'M'; // Default value added
 
     #[ORM\Column(type: "string", length: 15)]
-    private string $telephone_user;
+    private ?string $telephone_user;
 
     #[ORM\Column(type: "string", length: 255)]
-    private string $adresse_user;
+    private ?string $adresse_user;
 
     #[ORM\Column(type: "string", length: 255)]
-    private string $role;
+    private ?string $role;
 
     #[ORM\Column(type: "string", length: 255 , nullable: true)]
-    private string $experience;
+    private ?string $experience;
 
     #[ORM\Column(type: "float" , nullable: true)]
-    private float $salaire;
+    private ?float $salaire;
 
     #[ORM\Column(type: "string", length: 255 , nullable: true)]
-    private string $niveau_joueur;
+    private ?string $niveau_joueur;
 
     #[ORM\Column(type: "integer")]
-    private int $max_distance_user;
+    private ?int $max_distance_user;
 
     #[ORM\Column(type: "string", length: 1 , nullable: true)]
-    private string $is_premium;
+    private ?string $is_premium;
 
     #[ORM\Column(type: "string", length: 255)]
-    private string $photo_user;
+    private ?string $photo_user;
 
     #[ORM\Column(type: "string", length: 255)]
-    private string $piece_jointe;
+    private ?string $piece_jointe;
 
     #[ORM\Column(type: "string", length: 255)]
-    private string $reset_token;
+    private ?string $reset_token;
 
     #[ORM\Column(type: "datetime")]
-    private \DateTimeInterface $token_expiration;
+    private ?\DateTimeInterface $token_expiration;
 
     #[ORM\Column(type: "datetime")]
-    private \DateTimeInterface $date_naissance_user;
+    private ?\DateTimeInterface $date_naissance_user;
 
-    #[ORM\Column(type: "boolean")]
-    private bool $is_active;
+    #[ORM\Column(type: 'boolean')]
+    private bool $isActive = true;
 
-    #[ORM\Column(type: "datetime", nullable: true)]
-    private ?\DateTimeInterface $reactivate_at = null; // Made nullable and initialized to null
-
-    #[ORM\Column(type: "string", length: 255)]
-    private string $taille;
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $reactivateAt = null;
+    
 
     #[ORM\Column(type: "string", length: 255)]
-    private string $poids;
+    private ?string $taille;
 
     #[ORM\Column(type: "string", length: 255)]
-    private string $tour_de_taille;
+    private ?string $poids;
 
     #[ORM\Column(type: "string", length: 255)]
-    private string $maladie;
+    private ?string $tour_de_taille;
+
+    #[ORM\Column(type: "string", length: 255)]
+    private ?string $maladie;
 
     #[ORM\Column(type: "string", length: 255, nullable: true)]
-    private ?string $description_user = null; // Added property
+    private ?string $description_user = null; 
+    
+    #[ORM\Column(type: 'boolean')]
+    private bool $isTwoFactorEnabled = false; // Added property
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $stripeCustomerId = null;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $face_image = null;
+
+    #[ORM\Column(type: 'float', nullable: true)]
+private ?float $latitude = null;
+
+#[ORM\Column(type: 'float', nullable: true)]
+private ?float $longitude = null;
 
     public function getDescriptionUser(): ?string
     {
@@ -179,7 +195,7 @@ public function generateCustomId(): void
         $this->id_user = $value;
     }
 
-    public function getEmailUser()
+    public function getEmailUser(): ?string
     {
         return $this->email_user;
     }
@@ -361,28 +377,22 @@ public function generateCustomId(): void
 
     public function isActive(): bool
     {
-        return $this->is_active;
+        return $this->isActive;
     }
 
     public function setIsActive(bool $isActive): self
     {
-        $this->is_active = $isActive;
+        $this->isActive = $isActive;
         return $this;
-    }
-
-    public function getIsActive()
-    {
-        return $this->is_active;
     }
 
     public function getReactivateAt(): ?\DateTimeInterface
     {
-        return $this->reactivate_at;
+        return $this->reactivateAt;
     }
-
-    public function setReactivateAt(?\DateTimeInterface $value): self
+    public function setReactivateAt(?\DateTimeInterface $reactivateAt): self
     {
-        $this->reactivate_at = $value;
+        $this->reactivateAt = $reactivateAt;
         return $this;
     }
 
@@ -425,6 +435,58 @@ public function generateCustomId(): void
     {
         $this->maladie = $value;
     }
+    public function isTwoFactorEnabled(): bool
+{
+    return $this->isTwoFactorEnabled;
+}
+
+public function getStripeCustomerId(): ?string
+    {
+        return $this->stripeCustomerId;
+    }
+
+    public function setStripeCustomerId(?string $stripeCustomerId): self
+    {
+        $this->stripeCustomerId = $stripeCustomerId;
+        return $this;
+    }
+
+public function setIsTwoFactorEnabled(bool $isTwoFactorEnabled): self
+{
+    $this->isTwoFactorEnabled = $isTwoFactorEnabled;
+    return $this;
+}
+
+public function getFaceImage(): ?string
+{
+    return $this->face_image;
+}
+
+public function setFaceImage(?string $face_image): self
+{
+    $this->face_image = $face_image;
+    return $this;
+}
+public function getLatitude(): ?float
+{
+    return $this->latitude;
+}
+public function setLatitude(?float $latitude): self
+{
+    $this->latitude = $latitude;
+    return $this;
+}
+public function getLongitude(): ?float
+{
+    return $this->longitude;
+}
+public function setLongitude(?float $longitude): self
+{
+    $this->longitude = $longitude;
+    return $this;
+
+}
+
 
     #[ORM\OneToMany(mappedBy: "id_user", targetEntity: Event::class)]
     private Collection $events;

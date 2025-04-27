@@ -27,6 +27,7 @@
   <link rel="preload" as="style" href="{{ asset('front/mobirise/css/mbr-additional.css?v=JmQpxz') }}"><link rel="stylesheet" href="{{ asset('front/mobirise/css/mbr-additional.css?v=JmQpxz') }}" type="text/css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   
+  <script src="https://js.stripe.com/v3/"></script>
          <style>
       .cid-uBcQzsp0dJ {
       background-image: url("{{ asset('front/images/p-7-photoroom-1280x723.png') }}");
@@ -225,6 +226,46 @@
 </head>
 
 <body>
+
+
+
+  {% block javascript %}
+
+<script>
+    const isUserLoggedIn = "{{ app.user ? 'true' : 'false' }}";
+    const loginUrl = "{{ path('app_auth') }}";
+    const stripe = Stripe("{{ stripe_public_key }}");
+
+    function subscribe(plan) {
+
+      if (!isUserLoggedIn) {
+        window.location.href = loginUrl;
+        return;
+    }
+    fetch(`/create-checkout-session/${plan}`)
+        .then(response => response.json())
+        .then(session => {
+            if (session.error) {
+                console.error("Stripe session error:", session.error);
+                alert("Erreur lors de la création de la session.");
+                return;
+            }
+
+            return stripe.redirectToCheckout({ sessionId: session.id });
+        })
+        .then(result => {
+            if (result && result.error) {
+                alert(result.error.message);
+            }
+        })
+        .catch(error => {
+            console.error("Fetch error:", error);
+        });
+}
+</script>
+
+  {% endblock %}
+
     {% block body %}
         <!-- Navigation -->
         <section data-bs-version="5.1" class="menu menu2 cid-tJS6tZXiPa" once="menu" id="menu02-0">
@@ -295,88 +336,99 @@
         {% endblock %}
 
        <!-- Section de tarification -->
-  <div class="aa-price-package section" id="pricing">
-    <div class="container">
-      <div class="text-center">
-        <h2 class="title">Nous avons le forfait parfait pour vous</h2>
-        <p class="pb-5">Découvrez nos offres adaptées à vos besoins sportifs.<br/>Choisissez le forfait qui correspond à votre pratique.</p>
-      </div>
-      <div class="row">
-        <div class="col-lg-3 col-md-6">
-          <div class="card aa-price text-center">
-            <div class="card-body">
-              <div class="h5 mt-0">Basique</div>
-              <div class="aa-price-section"><sup>DT</sup><span>12.0</span><small>/mois</small></div>
-              <ul class="list-unstyled text-muted">
-                <li class="pt-3">1 terrain inclus</li>
-                <li>Accès aux événements</li>
-                <li>Support par email</li>
-                <li>Réservation simple</li>
-              </ul>
+       <div class="aa-price-package section" id="pricing">
+        <div class="container">
+            <div class="text-center">
+                <h2 class="title">Nous avons le forfait parfait pour vous</h2>
+                <p class="pb-5">Découvrez nos offres adaptées à vos besoins sportifs.<br/>Choisissez le forfait qui correspond à votre pratique.</p>
             </div>
-            <div class="card-footer">
-              <p><a href="#" class="text-muted text-small">Essai gratuit</a></p>
-              <a class="btn btn-outline-default btn-round" href="#">S'abonner</a>
+            <div class="row">
+                <!-- Carte Basique -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="card aa-price text-center">
+                        <div class="card-body">
+                            <div class="h5 mt-0">Basique</div>
+                            <div class="aa-price-section"><sup>DT</sup><span>12.0</span><small>/mois</small></div>
+                            <ul class="list-unstyled text-muted">
+                                <li class="pt-3">1 terrain inclus</li>
+                                <li>Accès aux événements</li>
+                                <li>Support par email</li>
+                                <li>Réservation simple</li>
+                            </ul>
+                        </div>
+                        <div class="card-footer">
+                            <p><a href="#" class="text-muted text-small">Essai gratuit</a></p>
+                            <button onclick="subscribe('basique')" class="btn btn-outline-default btn-round">S'abonner</button>
+
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Carte Standard -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="card text-center aa-price aa-price-active">
+                        <div class="card-body">
+                            <div class="h5 mt-0">Standard</div>
+                            <div class="aa-price-section bg-gradient"><sup>DT</sup><span>24.0</span><small>/mois</small></div>
+                            <ul class="list-unstyled text-muted">
+                                <li class="pt-3">3 terrains inclus</li>
+                                <li>Accès premium aux événements</li>
+                                <li>Support prioritaire</li>
+                                <li>Réservation avancée</li>
+                            </ul>
+                        </div>
+                        <div class="card-footer">
+                            <p><a href="#" class="text-muted text-small">Essai gratuit</a></p>
+                            <button onclick="subscribe('standard')" class="btn btn-outline-default btn-round">S'abonner</button>
+
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Carte Premium -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="card aa-price text-center">
+                        <div class="card-body">
+                            <div class="h5 mt-0">Premium</div>
+                            <div class="aa-price-section"><sup>DT</sup><span>50.0</span><small>/mois</small></div>
+                            <ul class="list-unstyled text-muted">
+                                <li class="pt-3">Terrains illimités</li>
+                                <li>Accès VIP aux événements</li>
+                                <li>Support 24/7</li>
+                                <li>Réservation instantanée</li>
+                            </ul>
+                        </div>
+                        <div class="card-footer">
+                            <p><a href="#" class="text-muted text-small">Essai gratuit</a></p>
+                            <button onclick="subscribe('premium')" class="btn btn-outline-default btn-round">S'abonner</button>
+
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Carte Club -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="card aa-price text-center">
+                        <div class="card-body">
+                            <div class="h5 mt-0">Club</div>
+                            <div class="aa-price-section"><sup>DT</sup><span>99.0</span><small>/mois</small></div>
+                            <ul class="list-unstyled text-muted">
+                                <li class="pt-3">Pour les clubs sportifs</li>
+                                <li>Gestion d'équipe</li>
+                                <li>Statistiques avancées</li>
+                                <li><b>Support dédié</b></li>
+                            </ul>
+                        </div>
+                        <div class="card-footer">
+                            <p><a href="#" class="text-muted text-small">Essai gratuit</a></p>
+                            <button onclick="subscribe('club')" class="btn btn-outline-default btn-round">S'abonner</button>
+
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-        <div class="col-lg-3 col-md-6">
-          <div class="card text-center aa-price aa-price-active">
-            <div class="card-body">
-              <div class="h5 mt-0">Standard</div>
-              <div class="aa-price-section bg-gradient"><sup>DT</sup><span>24.0</span><small>/mois</small></div>
-              <ul class="list-unstyled text-muted">
-                <li class="pt-3">3 terrains inclus</li>
-                <li>Accès premium aux événements</li>
-                <li>Support prioritaire</li>
-                <li>Réservation avancée</li>
-              </ul>
-            </div>
-            <div class="card-footer">
-              <p><a href="#" class="text-muted text-small">Essai gratuit</a></p>
-              <a class="btn btn-outline-default btn-round" href="#">S'abonner</a>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-3 col-md-6">
-          <div class="card aa-price text-center">
-            <div class="card-body">
-              <div class="h5 mt-0">Premium</div>
-              <div class="aa-price-section"><sup>DT</sup><span>50.0</span><small>/mois</small></div>
-              <ul class="list-unstyled text-muted">
-                <li class="pt-3">Terrains illimités</li>
-                <li>Accès VIP aux événements</li>
-                <li>Support 24/7</li>
-                <li>Réservation instantanée</li>
-              </ul>
-            </div>
-            <div class="card-footer">
-              <p><a href="#" class="text-muted text-small">Essai gratuit</a></p>
-              <a class="btn btn-outline-default btn-round" href="#">S'abonner</a>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-3 col-md-6">
-          <div class="card aa-price text-center">
-            <div class="card-body">
-              <div class="h5 mt-0">Club</div>
-              <div class="aa-price-section"><sup>DT</sup><span>99.0</span><small>/mois</small></div>
-              <ul class="list-unstyled text-muted">
-                <li class="pt-3">Pour les clubs sportifs</li>
-                <li>Gestion d'équipe</li>
-                <li>Statistiques avancées</li>
-                <li><b>Support dédié</b></li>
-              </ul>
-            </div>
-            <div class="card-footer">
-              <p><a href="#" class="text-muted text-small">Essai gratuit</a></p>
-              <a class="btn btn-outline-default btn-round" href="#">Contactez-nous</a>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
-  </div>
 
   <!-- Section témoignages -->
   <div class="container">
