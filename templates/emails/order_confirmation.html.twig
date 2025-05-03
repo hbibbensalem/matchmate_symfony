@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Confirmation de commande</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background-color: #f8f9fa; padding: 20px; text-align: center; }
+        .content { padding: 20px; }
+        .footer { margin-top: 20px; padding: 10px; text-align: center; font-size: 0.8em; color: #666; }
+        .order-details { margin: 20px 0; border: 1px solid #ddd; padding: 15px; border-radius: 5px; }
+        .product-image { max-width: 100px; height: auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Confirmation de commande</h1>
+            <p>Merci pour votre achat chez nous!</p>
+        </div>
+        
+        <div class="content">
+            <p>Bonjour {% if user.prenomUser is defined %}{{ user.prenomUser }}{% endif %},</p>
+            <p>Votre commande <strong>#{{ commande.idCommande }}</strong> a bien été enregistrée.</p>
+            
+            <div class="order-details">
+                <h3>Détails de la commande</h3>
+                <p><strong>Date:</strong> {{ commande.dateCommande|date('d/m/Y H:i') }}</p>
+                <p><strong>Produit:</strong> {{ produit.nomProduit }}</p>
+                <p><strong>Référence:</strong> {{ produit.refProduit }}</p>
+                <p><strong>Quantité:</strong> {{ commande.quantiteCommande }}</p>
+                <p><strong>Prix unitaire:</strong> {{ produit.prixProduit }} TND</p>
+                <p><strong>Total:</strong> {{ produit.prixProduit * commande.quantiteCommande }} TND</p>
+                
+                {% if commande.statusCommande == 'VALIDEE' %}
+                    <p><strong>Statut:</strong> <span style="color: green;">Validée</span></p>
+                {% endif %}
+            </div>
+            
+            <p>Vous pouvez suivre l'état de votre commande dans votre <a href="{{ url('app_commande_commandeFront') }}">espace client</a>.</p>
+            
+            <p>Cordialement,<br>L'équipe de notre boutique</p>
+        </div>
+        
+        <div class="footer">
+            <p>© {{ "now"|date("Y") }} Notre Boutique. Tous droits réservés.</p>
+            <p>Cet email a été envoyé automatiquement, merci de ne pas y répondre.</p>
+        </div>
+    </div>
+</body>
+</html>

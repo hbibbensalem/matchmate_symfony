@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Service\FaceService;
 use App\Service\FileUploader;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 
 final class AuthController extends AbstractController
@@ -186,20 +187,23 @@ public function login(AuthenticationUtils $authenticationUtils): Response
 
     if ($user instanceof User) {
         if (!$user->isActive()) {
+            // Clear the security token to log out the user
             $this->container->get('security.token_storage')->setToken(null);
-            
+
             $reactivateAt = $user->getReactivateAt();
             $errorMessage = 'Votre compte est désactivé ';
-            
+
             if ($reactivateAt instanceof \DateTimeInterface) {
-                // Format simple sans intl
                 $formattedDate = $reactivateAt->format('d/m/Y à H:i');
                 $errorMessage .= "jusqu'au ".$formattedDate;
             } else {
                 $errorMessage .= "définitivement";
             }
-            
+
+            // Add the error message as a flash message
             $this->addFlash('error', $errorMessage);
+
+            // Redirect back to the login page
             return $this->redirectToRoute('app_login');
         }
 

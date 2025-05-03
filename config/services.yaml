@@ -20,6 +20,7 @@ services:
     Symfony\Component\Finder\Finder:
         class: Symfony\Component\Finder\Finder
         shared: false
+    
 
     # default configuration for services in *this* file
     # Automatically registers your services as commands, event subscribers, etc.
@@ -41,6 +42,10 @@ services:
     App\Service\FileUploader:
         arguments:
             $targetDirectory: '%kernel.project_dir%/public/uploads/faces'
+
+    App\Service\CurrencyConverter:
+        arguments:
+            $apiKey: '%env(EXCHANGE_RATE_API_KEY)%'
 
 
     # add more service definitions when explicit configuration is needed

@@ -1,0 +1,249 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block title %}Dashboard Matchs{% endblock %}
+{% block current_page %}Matchs{% endblock %}
+{% block page_title %}Tableau des Matchs{% endblock %}
+
+{% block main_content %}
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="card mb-4">
+                    <div class="card-header pb-0">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap">
+                            <h6>Liste des Matchs</h6>
+                            <div class="d-flex align-items-center">
+                                <!-- Barre de recherche -->
+                                <div class="input-group input-group-outline mx-2" style="width: 300px;">
+                                    <input type="text" id="searchInput" class="form-control" placeholder="Localisation, organisateur ou sport...">
+                                    <button class="btn btn-outline-secondary" type="button" id="clearSearch">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                
+                                <!-- Boutons d'action -->
+                                <div class="btn-group">
+                                    <a href="{{ path('match_stats') }}" class="btn btn-sm btn-primary me-2">
+                                        <i class="fas fa-chart-bar me-1"></i> Stats
+                                    </a>
+                                    <a href="{{ path('match_export_excel') }}" class="btn btn-sm btn-success me-2">
+                                        <i class="fas fa-file-excel me-1"></i> Excel
+                                    </a>
+                                    <a href="{{ path('match_export_pdf') }}" class="btn btn-sm btn-danger">
+                                        <i class="fas fa-file-pdf me-1"></i> PDF
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body px-0 pt-0 pb-2">
+                        <div class="table-responsive p-0">
+                            <table class="table align-items-center mb-0" id="matchsTable">
+                                <thead>
+                                    <tr>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">ID</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Organisateur</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date & Heure</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Localisation</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Terrain</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sport</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Participants</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Statut</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for match in matchs %}
+                                    <tr class="match-row">
+                                        <td class="ps-4">{{ match.id }}</td>
+                                        <td>
+                                            <div class="d-flex px-2 py-1">
+                                                <div class="d-flex flex-column justify-content-center">
+                                                    <h6 class="mb-0 text-sm match-organizer">{{ match.id_user.nomUser }} {{ match.id_user.prenomUser }}</h6>
+                                                    <p class="text-xs text-secondary mb-0">{{ match.id_user.emailUser }}</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="text-secondary text-xs font-weight-bold">
+                                                {{ match.date|date('d/m/Y') }}<br>
+                                                {{ match.heure|date('H:i') }}
+                                            </span>
+                                        </td>
+                                        <td class="text-sm match-location">{{ match.localisation }}</td>
+                                        <td class="text-sm">{{ match.terrain }}</td>
+                                        <td class="text-sm match-sport">{{ match.typesport }}</td>
+                                        <td>
+                                            <span class="text-secondary text-xs font-weight-bold">
+                                                {{ match.listinscris|length }}/{{ match.nb_personne }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-sm bg-gradient-{{ match.statut == 'Validé' ? 'success' : (match.statut == 'Annulé' ? 'danger' : 'warning') }}">
+                                                {{ match.statut }}
+                                            </span>
+                                        </td>
+                                        <td class="align-middle">
+                                            <button class="btn btn-sm btn-outline-info view-participants" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#participantsModal"
+                                                    data-match-id="{{ match.id }}"
+                                                    data-match-title="Match du {{ match.date|date('d/m/Y') }} - {{ match.typesport }}">
+                                                <i class="fas fa-users"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="9" class="text-center py-4">Aucun match trouvé</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Participants -->
+    <div class="modal fade" id="participantsModal" tabindex="-1" aria-labelledby="participantsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="participantsModalLabel">Participants au match</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table align-items-center mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">ID</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nom & Prénom</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Email</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Téléphone</th>
+                                </tr>
+                            </thead>
+                            <tbody id="participantsList">
+                                <!-- Contenu chargé via AJAX -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Gestion du modal des participants
+            const participantsModal = document.getElementById('participantsModal');
+            if (participantsModal) {
+                participantsModal.addEventListener('show.bs.modal', function(event) {
+                    const button = event.relatedTarget;
+                    const matchId = button.getAttribute('data-match-id');
+                    const modalTitle = participantsModal.querySelector('.modal-title');
+                    const participantsList = document.getElementById('participantsList');
+
+                    // Mettre à jour le titre
+                    modalTitle.textContent = `Participants - ${button.getAttribute('data-match-title')}`;
+
+                    // Afficher loader
+                    participantsList.innerHTML = `
+                        <tr>
+                            <td colspan="4" class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Chargement...</span>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+
+                    // Chargement AJAX
+                    fetch(`/dashboard/match/${matchId}/participants`)
+                        .then(response => response.json())
+                        .then(data => {
+                            participantsList.innerHTML = '';
+                            if (data.length > 0) {
+                                data.forEach(participant => {
+                                    participantsList.innerHTML += `
+                                        <tr>
+                                            <td class="ps-4">${participant.id_user}</td>
+                                            <td>
+                                                <div class="d-flex px-2 py-1">
+                                                    <div class="d-flex flex-column justify-content-center">
+                                                        <h6 class="mb-0 text-sm">${participant.nom_user} ${participant.prenom_user}</h6>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-sm">${participant.email_user}</td>
+                                            <td class="text-sm">${participant.telephone_user || 'N/A'}</td>
+                                        </tr>
+                                    `;
+                                });
+                            } else {
+                                participantsList.innerHTML = `
+                                    <tr>
+                                        <td colspan="4" class="text-center py-4">
+                                            Aucun participant pour ce match
+                                        </td>
+                                    </tr>
+                                `;
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            participantsList.innerHTML = `
+                                <tr>
+                                    <td colspan="4" class="text-center py-4 text-danger">
+                                        Erreur lors du chargement
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                });
+            }
+
+            // Fonctionnalité de recherche
+            const searchInput = document.getElementById('searchInput');
+            const clearSearch = document.getElementById('clearSearch');
+            const matchRows = document.querySelectorAll('.match-row');
+
+            if (searchInput && matchRows) {
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase();
+                    
+                    matchRows.forEach(row => {
+                        const location = row.querySelector('.match-location').textContent.toLowerCase();
+                        const organizer = row.querySelector('.match-organizer').textContent.toLowerCase();
+                        const sport = row.querySelector('.match-sport').textContent.toLowerCase();
+                        
+                        if (location.includes(searchTerm) || 
+                            organizer.includes(searchTerm) || 
+                            sport.includes(searchTerm)) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                });
+
+                clearSearch.addEventListener('click', function() {
+                    searchInput.value = '';
+                    matchRows.forEach(row => {
+                        row.style.display = '';
+                    });
+                    searchInput.focus();
+                });
+            }
+        });
+    </script>
+{% endblock %}

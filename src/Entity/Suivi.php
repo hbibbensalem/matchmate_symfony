@@ -11,10 +11,11 @@ class Suivi
 {
 
     #[ORM\Id]
+    #[ORM\GeneratedValue] // Added to make it auto-increment
     #[ORM\Column(type: "integer")]
     private int $suivi_id;
 
-        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "suivis")]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "suivis")]
     #[ORM\JoinColumn(name: 'id_user', referencedColumnName: 'id_user', onDelete: 'CASCADE')]
     private User $id_user;
 
@@ -47,24 +48,25 @@ class Suivi
         $this->suivi_id = $value;
     }
 
-    public function getId_user()
+    public function getIdUser()
     {
         return $this->id_user;
     }
 
-    public function setId_user($value)
+    public function setIdUser($value)
     {
         $this->id_user = $value;
     }
 
-    public function getRegime_id()
+    public function getRegimeId()
     {
         return $this->regime_id;
     }
 
-    public function setRegime_id($value)
+    public function setRegimeId($value)
     {
         $this->regime_id = $value;
+        return $this;
     }
 
     public function getPoids()
@@ -77,12 +79,12 @@ class Suivi
         $this->poids = $value;
     }
 
-    public function getTour_de_taille()
+    public function getTourDeTaille()
     {
         return $this->tour_de_taille;
     }
 
-    public function setTour_de_taille($value)
+    public function setTourDeTaille($value)
     {
         $this->tour_de_taille = $value;
     }
@@ -97,12 +99,12 @@ class Suivi
         $this->imc = $value;
     }
 
-    public function getDate_suivi()
+    public function getDateSuivi()
     {
         return $this->date_suivi;
     }
 
-    public function setDate_suivi($value)
+    public function setDateSuivi($value)
     {
         $this->date_suivi = $value;
     }

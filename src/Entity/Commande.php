@@ -5,89 +5,110 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 use App\Entity\Produit;
+use App\Entity\User;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\DateTime;
+use Symfony\Component\Validator\Constraints\DateTimeInterface;
+
 
 #[ORM\Entity]
 class Commande
 {
 
     #[ORM\Id]
-    #[ORM\Column(type: "string", length: 255)]
-    private string $id_commande;
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name:"id_commande",type: "integer")]
+    private int $idCommande;
 
-        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "commandes")]
-    #[ORM\JoinColumn(name: 'id_user', referencedColumnName: 'id_user', onDelete: 'CASCADE')]
-    private User $id_user;
+    #[ORM\Column(name:"date_commande",type: "datetime")]
+    private \DateTimeInterface $dateCommande;
 
-        #[ORM\ManyToOne(targetEntity: Produit::class, inversedBy: "commandes")]
-    #[ORM\JoinColumn(name: 'idProduit', referencedColumnName: 'id_produit', onDelete: 'CASCADE')]
-    private Produit $idProduit;
+    #[ORM\Column(name:"quantite_commande",type: "integer")]
+    private int $quantiteCommande;
 
-    #[ORM\Column(type: "datetime")]
-    private \DateTimeInterface $date_commande;
+    #[ORM\ManyToOne(targetEntity: Produit::class, inversedBy: "commandes")]
+    #[ORM\JoinColumn(name: "idProduit", referencedColumnName: "id_produit", nullable: false, onDelete: "CASCADE")]
+    private ?Produit $produit = null;
 
-    #[ORM\Column(type: "integer")]
-    private int $quantite_commande;
+    #[ORM\Column(name:"status_commande",type: "string", length: 50, options: ["default" => "EN ATTENTE"])]
+    private string $statusCommande = 'EN ATTENTE';
 
-    #[ORM\Column(type: "string", length: 255)]
-    private string $status_commande;
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "commandes")]
+    #[ORM\JoinColumn(name: "id_user", referencedColumnName: "id_user", nullable: false)]
+    private ?User $user = null;
 
-    public function getId_commande()
+    public function getIdCommande()
     {
-        return $this->id_commande;
+        return $this->idCommande;
     }
 
-    public function setId_commande($value)
+    public function setIdCommande($value)
     {
-        $this->id_commande = $value;
+        $this->idCommande = $value;
+
     }
 
-    public function getId_user()
+    public function __construct()
     {
-        return $this->id_user;
+        $this->dateCommande = new \DateTime(); // Initialisation automatique
     }
 
-    public function setId_user($value)
+    public function setDateCommande(\DateTimeInterface $date): self
     {
-        $this->id_user = $value;
+        $this->dateCommande = $date;
+        return $this;
+    }
+    public function getDateCommande(): \DateTimeInterface
+    {
+        return $this->dateCommande;
+    }
+    
+ 
+
+    public function getQuantiteCommande()
+    {
+        return $this->quantiteCommande;
+
     }
 
-    public function getIdProduit()
+    public function setQuantiteCommande($value)
     {
-        return $this->idProduit;
+          $this->quantiteCommande = $value;
+    return $this;
     }
 
-    public function setIdProduit($value)
+    public function getProduit(): ?Produit
     {
-        $this->idProduit = $value;
+        return $this->produit;
+    }
+    
+    public function setProduit(?Produit $produit): self
+    {
+        $this->produit = $produit;
+        return $this;
     }
 
-    public function getDate_commande()
+    public function getStatusCommande()
     {
-        return $this->date_commande;
+        return $this->statusCommande;
     }
 
-    public function setDate_commande($value)
+    public function setStatusCommande($value)
     {
-        $this->date_commande = $value;
+        $this->statusCommande = $value;
+        return $this;
     }
 
-    public function getQuantite_commande()
+    public function getUser(): ?User
     {
-        return $this->quantite_commande;
+        return $this->user;
     }
 
-    public function setQuantite_commande($value)
+    public function setUser(?User $user): self
     {
-        $this->quantite_commande = $value;
-    }
-
-    public function getStatus_commande()
-    {
-        return $this->status_commande;
-    }
-
-    public function setStatus_commande($value)
-    {
-        $this->status_commande = $value;
+        $this->user = $user;
+        return $this;
     }
 }

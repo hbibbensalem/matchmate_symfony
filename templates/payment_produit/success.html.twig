@@ -1,0 +1,145 @@
+{% block title %}Paiement réussi{% endblock %}
+
+{% block body %}
+<style>
+    /* Styles inspirés de votre modal */
+    .container.my-5 {
+        background-color: transparent;
+        padding: 2rem 0;
+    }
+    
+    .card.border-success {
+        border: none !important;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-header.bg-success {
+        background: linear-gradient(135deg, #2ecc71, #27ae60) !important;
+        padding: 1.5rem;
+        border: none;
+    }
+    
+    .card-header h3 {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+    }
+    
+    .card-header h3 i {
+        margin-right: 12px;
+        font-size: 1.8rem;
+    }
+    
+    .card-body {
+        padding: 2.5rem;
+        background-color: #fff;
+    }
+    
+    .fa-check-circle {
+        color: #2ecc71;
+        filter: drop-shadow(0 2px 4px rgba(46, 204, 113, 0.3));
+    }
+    
+    .card-title {
+        color: #2c3e50;
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+    }
+    
+    .card-text {
+        color: #7f8c8d;
+        margin-bottom: 1.5rem;
+    }
+    
+    strong {
+        color: #2c3e50;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 50px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        background: linear-gradient(135deg, #2980b9, #3498db);
+    }
+    
+    .countdown-text {
+        font-size: 0.9rem;
+        color: #24292a;
+        margin-top: 1.5rem;
+    }
+    
+    .transaction-id {
+        background-color: #f8f9fa;
+        padding: 0.75rem;
+        border-radius: 8px;
+        display: inline-block;
+        margin-top: 1rem;
+    }
+</style>
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Paiement réussi
+                    </h3>
+                </div>
+                
+                <div class="card-body">
+                    <i class="fas fa-check-circle text-success mb-4" style="font-size: 5rem;"></i>
+                    <h4 class="card-title">Merci pour votre achat!</h4>
+                    <p class="card-text">Votre paiement a été traité avec succès.</p>
+                    
+                    <div class="transaction-id">
+                        <small class="text-muted">Référence de la transaction :</small>
+                        <div class="fw-bold">{{ session.id }}</div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <a href="{{ redirectUrl }}" class="btn btn-primary">
+                            <i class="fas fa-shopping-bag me-2"></i> Voir mes commandes
+                        </a>
+                    </div>
+                    
+                    <p class="countdown-text">
+                        <i class="fas fa-clock me-2"></i>
+                       Voir vos commandes dans <span id="countdown">5</span> secondes...
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Compte à rebours
+    let seconds = 5;
+    const countdownElement = document.getElementById('countdown');
+    const countdownInterval = setInterval(() => {
+        seconds--;
+        countdownElement.textContent = seconds;
+        if (seconds <= 0) {
+            clearInterval(countdownInterval);
+        }
+    }, 1000);
+
+    setTimeout(function() {
+        window.location.href = "{{ redirectUrl }}";
+    }, 5000);
+</script>
+{% endblock %}

@@ -234,7 +234,7 @@
 <script>
     const isUserLoggedIn = "{{ app.user ? 'true' : 'false' }}";
     const loginUrl = "{{ path('app_auth') }}";
-    const stripe = Stripe("{{ stripe_public_key }}");
+    const stripe = Stripe("{{ stripe_public_key|default('your-default-stripe-key') }}");
 
     function subscribe(plan) {
 
@@ -292,19 +292,34 @@
                             <li class="nav-item dropdown">
                                 <a class="nav-link link dropdown-toggle text-danger display-4" href="#features04-w" data-toggle="dropdown-submenu" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">Match</a>
                                 <div class="dropdown-menu" aria-labelledby="dropdown-182">
-                                    <a class="dropdown-item text-danger text-primary display-4" href="{{ path('app_home_front') }}">Organiser un match</a>
-                                    <a class="dropdown-item text-danger text-primary display-4" href="{{ path('app_home_front') }}">Rejoindre match</a>
-                                    <a class="dropdown-item text-danger text-primary display-4" href="{{ path('app_home_front') }}">Historique match</a>
+                                    <a class="dropdown-item text-danger text-primary display-4" href="{{ path('app_organiser_match') }}">Organiser un match</a>
+                                    <a class="dropdown-item text-danger text-primary display-4" href="{{ path('app_rejoindre_match') }}">Rejoindre match</a>
+                                    <a class="dropdown-item text-danger text-primary display-4" href="{{ path('app_historique') }}">Historique match</a>
                                 </div>
                             </li>
-                            <li class="nav-item"><a class="nav-link link text-danger text-primary display-4" href="{{ path('app_home_front') }}">Evénements</a></li>
+                          </li> <a class="nav-link link dropdown-toggle text-danger display-4" href="#features04-w" data-toggle="dropdown-submenu" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">Evénements</a>
+                          <div class="dropdown-menu" aria-labelledby="dropdown-182">
+                              <a class="dropdown-item text-danger text-primary display-4" href="{{ path('app_events_front') }}">Rejoindre Evénements</a>
+                              <a class="dropdown-item text-danger text-primary display-4" href="{{ path('app_mes_participations') }}"> mes participants</a>
+                             
+                          </div>
+                      </li>
 
     
-                            </li>
-                            <li class="nav-item"><a class="nav-link link text-danger text-primary display-4" href="{{ path('app_home_front') }}">Suivi nutrionnelle</a></li>
-
-                            </li>
-                            <li class="nav-item"><a class="nav-link link text-danger text-primary display-4" href="{{ path('app_home_front') }}">Boutique</a></li>
+                            <li class="nav-item dropdown">
+                              <a class="nav-link link dropdown-toggle text-danger display-4" href="#features04-w" data-toggle="dropdown-submenu" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">Nutrition</a>
+                              <div class="dropdown-menu" aria-labelledby="dropdown-182">
+                                  <a class="dropdown-item text-danger text-primary display-4" href="{{ path('app_regime_listpremiumFront') }}">Regime Nutritionnelle</a>
+                                  <a class="dropdown-item text-danger text-primary display-4" href="{{ path('app_suivi_new') }}">SUIVI</a>
+                              </div>
+                          </li>
+                          <li class="nav-item dropdown">
+                            <a class="nav-link link dropdown-toggle text-danger display-4" href="#features04-w" data-toggle="dropdown-submenu" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">Boutique</a>
+                            <div class="dropdown-menu" aria-labelledby="dropdown-182">
+                                <a class="dropdown-item text-danger text-primary display-4" href="{{ path('app_produit_front') }}">Produits</a>
+                                <a class="dropdown-item text-danger text-primary display-4" href="{{ path('app_commande_commandeFront') }}">Mes commandes</a>
+                              </div>
+                          </li>
                             <li class="nav-item"><a class="nav-link link text-danger text-primary display-4" href="{{ path('app_home_front') }}">Réclamation</a></li>
                             <li class="nav-item">
                                 <a class="nav-link link text-danger display-4" href="#contacts02-9">About</a>

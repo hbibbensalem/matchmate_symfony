@@ -31,7 +31,7 @@ class ForgotPasswordController extends AbstractController
     
             // Envoyer email
             $emailMessage = (new Email())
-                ->from('hbibbensalem20@gmail.com')
+                ->from('nourhenkhaz888@gmail.com')
                 ->to($user->getEmailUser())
                 ->subject('Réinitialisation de mot de passe')
                 ->html('<p>Votre code est : <strong>'.$token.'</strong></p>');

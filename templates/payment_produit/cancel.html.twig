@@ -1,0 +1,111 @@
+{% block title %}Paiement annulé{% endblock %}
+
+{% block body %}
+<style>
+    /* Styles rouges inspirés du thème d'erreur */
+    .container.my-5 {
+        background-color: transparent;
+        padding: 2rem 0;
+    }
+    
+    .card.border-danger {
+        border: none !important;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-header.bg-danger {
+        background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+        padding: 1.5rem;
+        border: none;
+    }
+    
+    .card-header h3 {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+    }
+    
+    .card-header h3 i {
+        margin-right: 12px;
+        font-size: 1.8rem;
+    }
+    
+    .card-body {
+        padding: 2.5rem;
+        background-color: #fff;
+    }
+    
+    .fa-times-circle {
+        color: #e74c3c;
+        filter: drop-shadow(0 2px 4px rgba(231, 76, 60, 0.3));
+    }
+    
+    .card-title {
+        color: #2c3e50;
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+    }
+    
+    .card-text {
+        color: #7f8c8d;
+        margin-bottom: 1.5rem;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 50px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        background: linear-gradient(135deg, #2980b9, #3498db);
+    }
+    
+    .info-text {
+        font-size: 0.9rem;
+        color: #95a5a6;
+        margin-top: 1.5rem;
+    }
+</style>
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-times-circle me-2"></i>
+                        Paiement annulé
+                    </h3>
+                </div>
+                
+                <div class="card-body">
+                    <i class="fas fa-times-circle text-danger mb-4" style="font-size: 5rem;"></i>
+                    <h4 class="card-title">Paiement non abouti</h4>
+                    <p class="card-text">Vous avez annulé le processus de paiement.</p>
+                    
+                    <div class="mt-4">
+                        <a href="{{ productsUrl }}" class="btn btn-primary">
+                            <i class="fas fa-arrow-left me-2"></i> Retour aux produits
+                        </a>
+                    </div>
+                    
+                    <p class="info-text">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Vous pouvez réessayer ultérieurement
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

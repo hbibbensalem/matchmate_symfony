@@ -9,8 +9,8 @@ use App\Entity\Event;
 #[ORM\Entity]
 class Participation
 {
-
     #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: "IDENTITY")]
     #[ORM\Column(type: "integer")]
     private int $idparticipation;
 

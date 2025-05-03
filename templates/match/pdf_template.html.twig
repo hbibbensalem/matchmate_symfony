@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Confirmation de réservation</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            line-height: 1.5;
+        }
+        .header { 
+            text-align: center; 
+            margin-bottom: 20px;
+            border-bottom: 2px solid #10888D;
+            padding-bottom: 15px;
+        }
+        h1 { 
+            color: #10888D; 
+            margin-bottom: 5px;
+        }
+        .details { 
+            margin: 25px 0; 
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+        .detail-row { 
+            margin-bottom: 8px;
+            display: flex;
+        }
+        .label { 
+            font-weight: bold; 
+            width: 120px;
+            color: #FF6B00;
+        }
+        .rules {
+            margin: 25px 0;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #fff9f5;
+        }
+        .rules-title {
+            color: #d9534f;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-decoration: underline;
+        }
+        .rule-item {
+            margin-bottom: 8px;
+            display: flex;
+        }
+        .rule-number {
+            font-weight: bold;
+            margin-right: 8px;
+            color: #10888D;
+        }
+        .footer { 
+            margin-top: 30px; 
+            font-size: 12px; 
+            text-align: center;
+            border-top: 1px solid #e0e0e0;
+            padding-top: 15px;
+            color: #666;
+        }
+        .signature {
+            margin-top: 40px;
+            padding-top: 10px;
+            border-top: 1px dashed #333;
+            width: 60%;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: center;
+        }
+        .warning {
+            color: #d9534f;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+    
+        <h1>Confirmation de réservation</h1>
+        <p>Merci pour votre participation, Document officiel - À conserver jusqu'au match</p>
+    </div>
+    
+    <div class="details">
+        <div class="detail-row">
+            <span class="label">Sport:</span>
+            <span>{{ match.typesport }}</span>
+        </div>
+        <div class="detail-row">
+            <span class="label">Date:</span>
+            <span>{{ match.date|date('d/m/Y') }}</span>
+        </div>
+        <div class="detail-row">
+            <span class="label">Heure:</span>
+            <span>{{ match.heure|date('H:i') }}</span>
+        </div>
+        <div class="detail-row">
+            <span class="label">Lieu:</span>
+            <span>{{ match.localisation }}</span>
+        </div>
+        <div class="detail-row">
+            <span class="label">Organisateur:</span>
+            <span>{{ match.id_user.getNomUser() }} {{ match.id_user.getPrenomUser() }}</span>
+        </div>
+        <div class="detail-row">
+            <span class="label">Participant:</span>
+            <span>{{ user.getNomUser() }} {{ user.getPrenomUser() }}</span>
+        </div>
+    </div>
+<div class="qr-code" style="text-align: center; margin: 20px 0;">
+    <img src="{{ qr_code_path }}" alt="QR Code de la réservation" style="width: 150px; height: 150px;">
+    <p style="font-size: 12px; color: #666;">Scannez ce QR code pour vérifier la réservation</p>
+</div>
+    <div class="rules">
+        <div class="rules-title">RÈGLES DU MATCH</div>
+        
+        <div class="rule-item">
+            <span class="rule-number">1.</span>
+            <span>Tout retard supérieur à <span class="warning">15 minutes</span> entraînera l'annulation automatique de votre participation.</span>
+        </div>
+        
+        <div class="rule-item">
+            <span class="rule-number">2.</span>
+            <span>En cas de retard, vous devez présenter <span class="warning">ce document</span> à l'organisateur pour justifier votre participation.</span>
+        </div>
+        
+        <div class="rule-item">
+            <span class="rule-number">3.</span>
+            <span>Toute absence non justifiée pourra entraîner une <span class="warning">suspension temporaire</span> de votre compte.</span>
+        </div>
+        
+        <div class="rule-item">
+            <span class="rule-number">4.</span>
+            <span>Le non-respect répété des règles peut entraîner une <span class="warning">exclusion définitive</span> de la plateforme.</span>
+        </div>
+    </div>
+
+    <div class="signature">
+        <p>Signature du participant</p>
+        <p>Lu et approuvé le {{ "now"|date('d/m/Y') }}</p>
+    </div>
+    
+    <div class="footer">
+        <p>Ce document officiel doit être présenté à l'organisateur le jour du match.</p>
+        <p>Document généré le {{ "now"|date('d/m/Y à H:i') }} - © SportMatch Platform</p>
+    </div>
+</body>
+</html>

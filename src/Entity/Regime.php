@@ -13,10 +13,11 @@ class Regime
 {
 
     #[ORM\Id]
+    #[ORM\GeneratedValue] // Added to make it auto-increment
     #[ORM\Column(type: "integer")]
     private int $regime_id;
 
-        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "regimes")]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "regimes")]
     #[ORM\JoinColumn(name: 'id_user', referencedColumnName: 'id_user', onDelete: 'CASCADE')]
     private User $id_user;
 
@@ -44,24 +45,26 @@ class Regime
     #[ORM\Column(type: "string", length: 50)]
     private string $statut;
 
-    public function getRegime_id()
+    public function getRegimeId()
     {
         return $this->regime_id;
     }
 
-    public function setRegime_id($value)
+    public function setRegimeId($value)
     {
         $this->regime_id = $value;
+        return $this;
     }
 
-    public function getId_user()
+    public function getIdUser(): User
     {
         return $this->id_user;
     }
 
-    public function setId_user($value)
+    public function setIdUser(User $value): self
     {
         $this->id_user = $value;
+        return $this;
     }
 
     public function getObjectif()
@@ -74,12 +77,12 @@ class Regime
         $this->objectif = $value;
     }
 
-    public function getCalories_journalieres()
+    public function getCaloriesJournalieres()
     {
         return $this->calories_journalieres;
     }
 
-    public function setCalories_journalieres($value)
+    public function setCaloriesJournalieres($value)
     {
         $this->calories_journalieres = $value;
     }
@@ -114,24 +117,26 @@ class Regime
         $this->lipides = $value;
     }
 
-    public function getDate_debut()
+    public function getDateDebut(): \DateTimeInterface
     {
         return $this->date_debut;
     }
 
-    public function setDate_debut($value)
+    public function setDateDebut(\DateTimeInterface $value): self
     {
         $this->date_debut = $value;
+        return $this;
     }
 
-    public function getDate_fin()
+    public function getDateFin(): \DateTimeInterface
     {
         return $this->date_fin;
     }
 
-    public function setDate_fin($value)
+    public function setDateFin(\DateTimeInterface $value): self
     {
         $this->date_fin = $value;
+        return $this;
     }
 
     public function getStatut()
@@ -156,7 +161,7 @@ class Regime
         {
             if (!$this->suivis->contains($suivi)) {
                 $this->suivis[] = $suivi;
-                $suivi->setRegime_id($this);
+                $suivi->setRegimeId($this);
             }
     
             return $this;
@@ -166,8 +171,8 @@ class Regime
         {
             if ($this->suivis->removeElement($suivi)) {
                 // set the owning side to null (unless already changed)
-                if ($suivi->getRegime_id() === $this) {
-                    $suivi->setRegime_id(null);
+                if ($suivi->getRegimeId() === $this) {
+                    $suivi->setRegimeId(null);
                 }
             }
     

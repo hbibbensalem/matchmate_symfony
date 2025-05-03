@@ -1,0 +1,105 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block title %}Participants - {{ event.titre }}{% endblock %}
+{% block current_page %}Événements > Participants{% endblock %}
+{% block page_title %}Participants pour "{{ event.titre }}"{% endblock %}
+
+{% block main_content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header pb-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6>Liste des Participants</h6>
+                            <p class="text-sm mb-0">
+                                <i class="fa fa-users text-info me-1"></i>
+                                <span class="font-weight-bold">{{ participations|length }}</span> participants
+                            </p>
+                        </div>
+                        <div>
+                            <a href="{{ path('app_dashboard_event', {'id': event.idevent}) }}" 
+                               class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-1"></i> Retour à l'événement
+                            </a>
+                            <a href="{{ path('export_event_participants', {'id': event.idevent}) }}" class="btn btn-success">
+                            Exporter en Excel
+</a>
+                        
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body px-0 pt-0 pb-2">
+                    <div class="table-responsive p-0">
+                        <table class="table align-items-center mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">ID</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Participant</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sexe</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date de naissance</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Événement</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for participation in participations %}
+                                <tr>
+                                    <td class="ps-4">
+                                        <span class="text-secondary text-xs font-weight-bold">#{{ participation.id_user.getIdUser() }}</span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex px-2 py-1">
+                                            {% if participation.id_user.getPhotoUser() %}
+                                                <div>
+                                                    <img src="{{ asset('uploads/users/' ~ participation.id_user.getPhotoUser()) }}" 
+                                                         class="avatar avatar-sm me-3" 
+                                                         alt="Photo utilisateur">
+                                                </div>
+                                            {% endif %}
+                                            <div class="d-flex flex-column justify-content-center">
+                                                <h6 class="mb-0 text-sm">
+                                                    <a href="{{ path('app_user_participations', {'id': participation.id_user.getIdUser()}) }}" 
+                                                       class="text-decoration-none">
+                                                        {{ participation.id_user.getNomUser() }} {{ participation.id_user.getPrenomUser() }}
+                                                    </a>
+                                                </h6>
+                                                <p class="text-xs text-secondary mb-0">{{ participation.id_user.getEmailUser() }}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="text-secondary text-xs font-weight-bold">
+                                            {{ participation.id_user.getSexeUser() == 'M' ? 'Masculin' : 'Féminin' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="text-secondary text-xs font-weight-bold">
+                                            {{ participation.id_user.getDateNaissanceUser()|date('d/m/Y') }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="text-secondary text-xs font-weight-bold">
+                                            {{ participation.idevent.getTitre() }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4">
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            Aucun participant pour cet événement
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

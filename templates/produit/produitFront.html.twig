@@ -1,0 +1,1274 @@
+{% extends 'baseFront.html.twig' %}
+
+{% block title %}{{ page_title|default('Nos Produits') }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar de filtrage -->
+        <div class="col-md-3 col-lg-2 d-md-block bg-light sidebar mt-5">
+            <div class="position-sticky pt-3">
+                <!-- Filtre par prix -->
+                <div class="mb-1">
+                    <h5 class="fw-bold mb-3">Filtrer par prix</h5>
+                    <div class="range-slider mb-2">
+                        <input type="range" class="form-range" min="0" max="1000" value="0" id="priceMin">
+                        <input type="range" class="form-range" min="0" max="1000" value="1000" id="priceMax">
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span id="minPriceValue">0 DT</span>
+                        <span id="maxPriceValue">1000 DT</span>
+                    </div>
+                </div>
+
+                <!-- Filtre par catégorie -->
+                <div class="mb-4">
+                    <h5 class="fw-bold mb-3">Catégories</h5>
+                    <div class="form-check">
+                        <input class="form-check-input category-filter" type="checkbox" 
+                               data-keywords="vetement,tenue,jupe,short,t-shirt,top,chemise,pantalon,T-SHIRT,SHORT,TENUE"
+                               id="filterVetements">
+                        <label class="form-check-label" for="filterVetements">
+                            Vêtements
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input category-filter" type="checkbox"
+                               data-keywords="nutrition,alimentaire,protéine,calorie,repas,manger,fruit,légume,aliment"
+                               id="filterNutrition">
+                        <label class="form-check-label" for="filterNutrition">
+                            Nutrition
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input category-filter" type="checkbox"
+                               data-keywords="sport,raquette,balle,entrainement,exercice,football,basketball"
+                               id="filterSport">
+                        <label class="form-check-label" for="filterSport">
+                            Sport
+                        </label>
+                    </div>
+                </div>
+  <!-- Convertisseur de devises -->
+<div class="mb-4">
+    <h5 class="fw-bold mb-3">Devise</h5>
+    <div class="btn-group w-100" role="group">
+        <a href="{{ path('convert_currency', {'currency': 'EUR'}) }}" 
+           class="btn btn-outline-secondary {% if current_currency == 'EUR' %}active{% endif %}"
+           title="Convertir en Euros">
+            <img src="{{ asset('front/images/euro.png') }}" alt="EUR" style="width: 20px; height: 20px;">
+        </a>
+        <a href="{{ path('convert_currency', {'currency': 'USD'}) }}" 
+           class="btn btn-outline-secondary {% if current_currency == 'USD' %}active{% endif %}"
+           title="Convertir en Dollars">
+            <img src="{{ asset('front/images/dollar.png') }}" alt="USD" style="width: 20px; height: 20px;">
+        </a>
+        <a href="{{ path('convert_currency', {'currency': 'TND'}) }}" 
+           class="btn btn-outline-secondary {% if current_currency == 'TND' %}active{% endif %}"
+           title="Revenir en Dinars Tunisiens">
+            <img src="{{ asset('front/images/TND.png') }}" alt="TND" style="width: 20px; height: 20px;">
+        </a>
+    </div>
+ 
+    <small class="text-muted mt-2 d-block">Devise actuelle: {{ current_currency }}</small>
+</div>
+            </div>
+        </div>
+
+        <!-- Contenu principal -->
+        <div class="col-md-9 col-lg-10">
+            <section data-bs-version="5.1" class="pricing02 cid-uBd64ihyWL" id="pricing02-1y">
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-12 content-head">
+                            <div class="mbr-section-head mb-5">
+                                <h4 class="mbr-section-title mbr-fonts-style align-center mb-0 display-2">
+                                    <strong>Nos Produits</strong>
+                                </h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Barre de recherche améliorée -->
+                    <div class="row mb-4">
+                        <div class="col-md-8 mx-auto">
+                            <div class="search-container position-relative">
+                                <input type="text" id="searchInput" class="form-control form-control-lg ps-5 shadow-sm" 
+                                       placeholder="Rechercher par nom, référence ou description..." 
+                                       style="border-radius: 50px;">
+                                <i class="fas fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                                <div id="searchSuggestions" class="dropdown-menu w-100 mt-1 shadow-lg border-0" style="display: none; max-height: 400px; overflow-y: auto;">
+                                    <!-- Suggestions apparaîtront ici -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                  
+                       
+
+                    <div class="row" id="productsContainer">
+                        <!-- D'abord les produits les plus commandés avec épingle -->
+                        {% for topProduct in topProducts %}
+                            {% set produit = produits|filter(p => p.idProduit == topProduct.productId)|first %}
+                            {% if produit %}
+                            <div class="item features-image col-12 col-md-6 col-lg-4 mb-4 product-card pinned-product"
+                                 data-name="{{ produit.nomProduit|lower }}" 
+                                 data-description="{{ produit.descriptionProduit|lower }}"
+                                 data-ref="{{ produit.refProduit|lower }}"
+                                 data-price="{{ produit.prixProduit }}">
+                                <div class="item-wrapper h-100 shadow-sm rounded-3 overflow-hidden bg-white position-relative">
+                                    <!-- Épingle -->
+                                    <div class="position-absolute top-0 end-0 m-3 pin-badge">
+                                        
+                                        <span class="position-absolute top-50 start-50 translate-middle fw-bold text-white" style="font-size: 0.7rem; z-index: 2; background-color: #c12110;">
+                                            Top {{ loop.index }}
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="position-absolute top-0 start-0 m-1">
+                                        <img src="{{ asset('front/images/pin-icon.png') }}" 
+                                             alt="Produit populaire" 
+                                             class="img-fluid"
+                                             style="width: 50px; height: 30px; object-fit: contain;">
+                                    </div>
+                                    <div class="item-img">
+                                        <img src="{{ produit.imageProduit ? asset('uploads/' ~ produit.imageProduit) : asset('front/images/default-product.jpg') }}" 
+                                             alt="{{ produit.nomProduit }}" 
+                                             class="img-fluid w-100 product-image"
+                                             style="height: 500px; object-fit: cover;">
+                                    </div>
+                                    <div class="item-content p-3">  
+                                        <h5 class="item-title mbr-fonts-style display-5 mb-2">
+                                            <strong>{{ produit.nomProduit }}</strong>
+                                        </h5>
+
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <small class="text-muted">Réf: {{ produit.refProduit }}</small>
+                                            <span class="badge stock-badge {{ produit.quantiteProduit > 0 ? 'in-stock' : 'out-of-stock' }}">
+                                                {{ produit.quantiteProduit > 0 ? '✔ En stock' : '✖ Rupture' }}
+                                            </span>
+                                        </div>
+
+                                        <div class="mb-2">
+                                            {% if current_currency == 'TND' %}
+                                                <span class="text-warning fw-bold fs-5">{{ produit.prixProduit }} TND</span>
+                                            {% else %}
+                                                {% set converted_price = currencyConverter.convert(produit.prixProduit, 'TND', current_currency) %}
+                                                <span class="text-warning fw-bold fs-5">
+                                                    {{ converted_price|number_format(2) }} {{ current_currency }}
+                                                    <small class="text-muted">({{ produit.prixProduit }} TND)</small>
+                                                </span>
+                                            {% endif %}
+                                        </div>
+
+                                        <p class="mbr-text mbr-fonts-style text-muted mb-3" style="font-size: 0.9rem;">
+                                            {% if produit.descriptionProduit|length > 100 %}
+                                                {{ produit.descriptionProduit|slice(0, 100) }}...
+                                            {% else %}
+                                                {{ produit.descriptionProduit }}
+                                            {% endif %}
+                                        </p>
+
+                                        <div class="mbr-section-btn item-footer mt-auto">
+                                            <button class="btn btn-primary w-100 btn-commander" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#commandeModal"
+                                                    data-produit-id="{{ produit.idProduit }}"
+                                                    data-produit-nom="{{ produit.nomProduit }}"
+                                                    data-produit-ref="{{ produit.refProduit }}"
+                                                    data-produit-prix="{{ produit.prixProduit }}"
+                                                    data-produit-image="{{ produit.imageProduit ? asset('uploads/' ~ produit.imageProduit) : asset('front/images/default-product.jpg') }}"
+                                                   
+                                                    {% if produit.quantiteProduit <= 0 %}disabled{% endif %}>
+                                                <i class="fas fa-shopping-cart me-2"></i>Commander
+                                            </button>
+   
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        <!-- Ensuite les produits normaux -->
+                        {% for produit in produits %}
+                           {% set isTopProduct = false %}
+                           {% for topProduct in topProducts %} 
+                            {% if topProduct.productId == produit.idProduit %}
+            {% set isTopProduct = true %}
+        {% endif %}
+    {% endfor %} 
+
+                        {% if not isTopProduct %}
+                        <div class="item features-image col-12 col-md-6 col-lg-4 mb-4 product-card"
+                             data-name="{{ produit.nomProduit|lower }}" 
+                             data-description="{{ produit.descriptionProduit|lower }}"
+                             data-ref="{{ produit.refProduit|lower }}"
+                             data-price="{{ produit.prixProduit }}">
+                            <div class="item-wrapper h-100 shadow-sm rounded-3 overflow-hidden bg-white position-relative">
+                                <div class="item-img">
+                                    <img src="{{ produit.imageProduit ? asset('uploads/' ~ produit.imageProduit) : asset('front/images/default-product.jpg') }}" 
+                                         alt="{{ produit.nomProduit }}" 
+                                         class="img-fluid w-100 product-image"
+                                         style="height: 500px; object-fit: cover;">
+                                </div>
+                                <div class="item-content p-3">  
+                                    <h5 class="item-title mbr-fonts-style display-5 mb-2">
+                                        <strong>{{ produit.nomProduit }}</strong>
+                                    </h5>
+
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <small class="text-muted">Réf: {{ produit.refProduit }}</small>
+                                        <span class="badge stock-badge {{ produit.quantiteProduit > 0 ? 'in-stock' : 'out-of-stock' }}">
+                                            {{ produit.quantiteProduit > 0 ? '✔ En stock' : '✖ Rupture' }}
+                                        </span>
+                                    </div>
+
+                                    <div class="mb-2">
+                                        {% if current_currency == 'TND' %}
+                                            <span class="text-warning fw-bold fs-5">{{ produit.prixProduit }} TND</span>
+                                        {% else %}
+                                            {% set converted_price = currencyConverter.convert(produit.prixProduit, 'TND', current_currency) %}
+                                            <span class="text-warning fw-bold fs-5">
+                                                {{ converted_price|number_format(2) }} {{ current_currency }}
+                                                <small class="text-muted">({{ produit.prixProduit }} TND)</small>
+                                            </span>
+                                        {% endif %}
+                                    </div>
+
+                                    <p class="mbr-text mbr-fonts-style text-muted mb-3" style="font-size: 0.9rem;">
+                                        {% if produit.descriptionProduit|length > 100 %}
+                                            {{ produit.descriptionProduit|slice(0, 100) }}...
+                                        {% else %}
+                                            {{ produit.descriptionProduit }}
+                                        {% endif %}
+                                    </p>
+
+                                    <div class="mbr-section-btn item-footer mt-auto">
+                                        <button class="btn btn-primary w-100 btn-commander" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#commandeModal"
+                                                data-produit-id="{{ produit.idProduit }}"
+                                                data-produit-nom="{{ produit.nomProduit }}"
+                                                data-produit-ref="{{ produit.refProduit }}"
+                                                data-produit-prix="{{ produit.prixProduit }}"
+                                                data-produit-image="{{ produit.imageProduit ? asset('uploads/' ~ produit.imageProduit) : asset('front/images/default-product.jpg') }}"
+                                             
+
+                                                {% if produit.quantiteProduit <= 0 %}disabled{% endif %}>
+                                            <i class="fas fa-shopping-cart me-2"></i>Commander
+                                        </button>
+  
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de commande -->
+<div class="modal fade" id="commandeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 800px;">
+        <div class="modal-content" style="border-radius: 10px; overflow: hidden; box-shadow: 0 0 20px rgba(0,0,0,0.1);">
+            <div class="modal-header" style="background-color: #6a7d91; color: #fff; border-bottom: none; padding: 2rem 2.5rem;">
+                <h5 class="modal-title">Commander ce produit</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body" style="padding: 1.5rem;">
+                <div class="row g-3 align-items-center">
+                    <div class="col-md-5 text-center">
+                        <img id="modalProduitImage" src="" alt="" class="img-fluid rounded" style="max-height: 300px; object-fit: cover;">
+                       
+                    </div>
+                    <div class="col-md-7">
+                        <h4 id="modalProduitNom" style="margin-bottom: 0.5rem; font-weight: 700; color: #333;"></h4>
+                        <p id="modalProduitRef" style="color: #6c757d; margin-bottom: 0.5rem;"></p>
+                        <p id="modalProduitPrix" style="font-weight: bold; font-size: 1.5rem; color: #095a5e; margin-bottom: 1rem;"></p>
+                        
+                        <form id="commandeForm" action="{{ path('app_commande_new') }}" method="POST">
+                            <input type="hidden" name="idProduit" id="modalProduitId">
+                            <input type="hidden" name="_token" value="{{ csrf_token('commande') }}">
+                            
+                            <div class="mb-3">
+                                <label for="quantiteCommande" class="form-label" style="font-weight: 500;">Quantité :</label>
+                                <div class="input-group">
+                                    <button class="btn btn-outline-secondary" type="button" id="decrement-qty">-</button>
+                                    <input type="number" class="form-control text-center" 
+                                           id="quantiteCommande" name="quantiteCommande" 
+                                           min="1" value="1" required style="padding: 0.5rem;">
+                                    <button class="btn btn-outline-secondary" type="button" id="increment-qty">+</button>
+                                </div>
+                                <div class="form-text text-end fw-bold" id="totalPrice" style="margin-top: 0.5rem;">
+                                    Total: <span id="totalPriceValue">0.000</span> DT
+                                </div>
+                            </div>
+                            
+                            <div class="alert alert-warning d-none" id="stockAlert">
+                                Quantité demandée non disponible
+                            </div>
+                            
+                            <div class="d-flex justify-content-end mt-4">
+                                <button type="button" class="btn btn-danger me-2" data-bs-dismiss="modal"
+                                    style="padding: 0.5rem 1rem; border-radius: 14px; font-size: 1rem;">
+                                    <i class="fas fa-times me-1"></i> Annuler
+                                </button>
+                                <button type="submit" class="btn btn-primary" id="submitBtn"
+                                    style="padding: 0.5rem 1rem; border-radius: 14px; font-size: 1rem;">
+                                    <i class="fas fa-check me-1"></i> Confirmer
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal pour le choix du mode de paiement -->
+<div class="modal fade" id="paiementChoiceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 600px;">
+        <div class="modal-content" style="border-radius: 10px; overflow: hidden; box-shadow: 0 0 20px rgba(0,0,0,0.1);">
+            <div class="modal-header" style="background-color: #6a7d91; color: #fff; border-bottom: none; padding: 2rem 2.5rem;">
+                <h5 class="modal-title">Choisissez votre mode de paiement</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body" style="padding: 2rem;">
+                <div class="row g-4 justify-content-center">
+                    <!-- Option Paiement en espèces -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 choix-paiement" data-paiement-type="espece" 
+                             style="cursor: pointer; border-radius: 10px; transition: all 0.3s; border: none; background: #f8f9fa;">
+                            <div class="card-body text-center p-4 d-flex flex-column align-items-center">
+                                <div class="mb-3" style="width: 80px; height: 80px; background-color: #e9f5e9; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                    <img src="{{ asset('front/images/espece.png') }}" alt="Espèces" style="width: 50px; height: 50px;">
+                                </div>
+                                <h5 class="card-title mb-2" style="font-weight: 700; color: #333;">Payer en espèces</h5>
+                                <p class="card-text text-muted mb-0">Payez à la livraison en cash</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Option Paiement en ligne -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 choix-paiement" data-paiement-type="enligne" onclick="processOnlinePayment()" 
+                             style="cursor: pointer; border-radius: 10px; transition: all 0.3s; border: none; background: #f8f9fa;">
+                            <div class="card-body text-center p-4 d-flex flex-column align-items-center">
+                                <div class="mb-3" style="width: 80px; height: 80px; background-color: #e6f0fa; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                    <img src="{{ asset('front/images/onligne.png') }}" alt="En ligne" style="width: 50px; height: 50px;">
+                                </div>
+                                <h5 class="card-title mb-2"style="font-weight: 700; color: #333;">Payer en ligne</h5>
+                                <p class="card-text text-muted mb-0">Paiement sécurisé par carte</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-3">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"
+                        style="padding: 0.5rem 1.5rem; border-radius: 20px; font-size: 1rem;">
+                        <i class="fas fa-arrow-left me-2"></i> Retour
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de succès -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-gradient-success text-white border-0">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-check-circle me-3" style="font-size: 1.8rem;"></i>
+                    <div>
+                        <h5 class="modal-title mb-0">Commande validée avec succès</h5>
+                        <small class="opacity-75">Confirmation de votre commande</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4">
+                <div class="row">
+                    <div class="col-3 text-center">
+                        <i class="fas fa-check-circle text-success mb-3" style="font-size: 3.5rem;"></i>
+                    </div>
+                    <div class="col-9">
+                        <h4 id="successMessage" class="mb-3">Votre commande a bien été enregistrée</h4>
+                        <div class="alert alert-success bg-light-success border-0">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <span id="successDetails">Vous recevrez un email de confirmation sous peu.</span>
+                        </div>
+                        <div class="d-flex align-items-center mt-3">
+                            <i class="fas fa-clock me-2 text-muted"></i>
+                            <small class="text-muted"> <span id="successCountdown"></span></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 justify-content-between">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Fermer maintenant
+                </button>
+                <button type="button" class="btn btn-success" id="closeSuccessModal">
+                    <i class="fas fa-shopping-bag me-1"></i> Voir ma commande
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal d'erreur -->
+<div class="modal fade" id="errorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-gradient-danger text-white border-0">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-exclamation-triangle me-3" style="font-size: 1.8rem;"></i>
+                    <div>
+                        <h5 class="modal-title mb-0">Erreur lors de la commande</h5>
+                        <small class="opacity-75">Une erreur est survenue</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4">
+                <div class="row">
+                    <div class="col-3 text-center">
+                        <i class="fas fa-exclamation-circle text-danger mb-3" style="font-size: 3.5rem;"></i>
+                    </div>
+                    <div class="col-9">
+                        <h4 id="errorMessage" class="mb-3">Une erreur est survenue</h4>
+                        <div class="alert alert-danger bg-light-danger border-0">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <span id="errorDetails">Veuillez réessayer ou contacter notre support.</span>
+                        </div>
+                       
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 justify-content-between">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Fermer
+                </button>
+                <a href="{{ path('app_login') }}" class="btn btn-danger">
+                    <i class="fas fa-redo me-1"></i> Me connecter
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    
+document.addEventListener('DOMContentLoaded', function() {
+ /***********************/
+    /* SYSTEME DE FILTRAGE COMBINE */
+    /***********************/
+    
+    // Éléments du DOM
+    const priceMin = document.getElementById('priceMin');
+    const priceMax = document.getElementById('priceMax');
+    const minPriceValue = document.getElementById('minPriceValue');
+    const maxPriceValue = document.getElementById('maxPriceValue');
+    const categoryFilters = document.querySelectorAll('.category-filter');
+    const searchInput = document.getElementById('searchInput');
+    const searchSuggestions = document.getElementById('searchSuggestions');
+    const productCards = Array.from(document.querySelectorAll('.product-card'));
+    const stripe = Stripe('{{ stripe_public_key }}');
+    
+    // Initialisation
+    minPriceValue.textContent = `${priceMin.value} DT`;
+    maxPriceValue.textContent = `${priceMax.value} DT`;
+    
+    // Fonction de normalisation du texte
+    function normalizeText(text) {
+        return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    }
+    
+    // Fonction principale de filtrage
+    function applyAllFilters() {
+        const minPrice = parseFloat(priceMin.value);
+        const maxPrice = parseFloat(priceMax.value);
+        const searchTerm = normalizeText(searchInput.value.trim());
+        
+        // Récupérer les catégories sélectionnées
+        const activeCategories = Array.from(document.querySelectorAll('.category-filter:checked'))
+            .flatMap(filter => filter.dataset.keywords.split(',').map(k => normalizeText(k.trim())));
+        
+        productCards.forEach(card => {
+            // Filtrage par prix
+            const price = parseFloat(card.dataset.price);
+            const priceMatch = price >= minPrice && price <= maxPrice;
+            
+            // Filtrage par catégorie
+            let categoryMatch = activeCategories.length === 0;
+            if (!categoryMatch) {
+                const name = normalizeText(card.dataset.name);
+                const desc = normalizeText(card.querySelector('.mbr-text').textContent);
+                categoryMatch = activeCategories.some(keyword => 
+                    name.includes(keyword) || desc.includes(keyword)
+                );
+            }
+            
+            // Filtrage par recherche
+            let searchMatch = searchTerm === '';
+            if (!searchMatch) {
+                const name = normalizeText(card.dataset.name);
+                const desc = normalizeText(card.dataset.description);
+                const ref = normalizeText(card.dataset.ref);
+                searchMatch = name.includes(searchTerm) || 
+                             desc.includes(searchTerm) || 
+                             ref.includes(searchTerm);
+            }
+            
+            // Appliquer tous les filtres combinés
+            card.style.display = (priceMatch && categoryMatch && searchMatch) ? 'block' : 'none';
+        });
+    }
+    
+    // Génération des suggestions de recherche
+    function generateSuggestions(searchTerm) {
+        const term = normalizeText(searchTerm.trim());
+        searchSuggestions.innerHTML = '';
+        
+        if (term.length < 2) {
+            searchSuggestions.style.display = 'none';
+            return;
+        }
+        
+        const matchedProducts = productCards.filter(card => {
+            if (card.style.display === 'none') return false;
+            
+            const name = normalizeText(card.dataset.name);
+            const desc = normalizeText(card.dataset.description);
+            const ref = normalizeText(card.dataset.ref);
+            
+            return name.includes(term) || desc.includes(term) || ref.includes(term);
+        }).slice(0, 5);
+        
+        if (matchedProducts.length === 0) {
+            searchSuggestions.style.display = 'none';
+            return;
+        }
+        
+        matchedProducts.forEach(card => {
+            const productName = card.querySelector('.item-title').textContent;
+            const productImage = card.querySelector('.item-img img').src;
+            const productPrice = card.querySelector('.text-warning').textContent;
+            const productRef = card.dataset.ref;
+            
+            const suggestionItem = document.createElement('a');
+            suggestionItem.className = 'dropdown-item d-flex align-items-center py-2 px-3 border-bottom';
+            suggestionItem.href = '#';
+            suggestionItem.innerHTML = `
+                <img src="${productImage}" alt="${productName}" 
+                     class="rounded me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                <div>
+                    <div class="fw-bold text-dark">${productName}</div>
+                    <div class="d-flex justify-content-between">
+                        <small class="text-muted">${productRef}</small>
+                        <small class="text-warning fw-bold">${productPrice}</small>
+                    </div>
+                </div>
+            `;
+            
+            suggestionItem.addEventListener('click', function(e) {
+                e.preventDefault();
+                searchInput.value = productName;
+                applyAllFilters();
+                searchSuggestions.style.display = 'none';
+                
+                // Animation et scroll
+                card.style.animation = 'highlight 1s';
+                setTimeout(() => card.style.animation = '', 1000);
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+            
+            searchSuggestions.appendChild(suggestionItem);
+        });
+        
+        searchSuggestions.style.display = 'block';
+    }
+
+       /***********************/
+    /* Paiement*/
+    /***********************/
+    
+    
+    /***********************/
+    /* ECOUTEURS D'EVENEMENTS */
+    /***********************/
+    
+    // Filtres prix
+    priceMin.addEventListener('input', function() {
+        minPriceValue.textContent = `${this.value} DT`;
+        applyAllFilters();
+    });
+    
+    priceMax.addEventListener('input', function() {
+        maxPriceValue.textContent = `${this.value} DT`;
+        applyAllFilters();
+    });
+    
+    // Filtres catégories
+    categoryFilters.forEach(checkbox => {
+        checkbox.addEventListener('change', applyAllFilters);
+    });
+    
+    // Barre de recherche
+    searchInput.addEventListener('input', function() {
+        applyAllFilters();
+        
+        // Gestion des suggestions
+        if (this.value.trim().length >= 2) {
+            generateSuggestions(this.value);
+        } else {
+            searchSuggestions.style.display = 'none';
+        }
+    });
+    
+    searchInput.addEventListener('focus', function() {
+        if (this.value.trim().length >= 2) {
+            generateSuggestions(this.value);
+        }
+    });
+    
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !searchSuggestions.contains(e.target)) {
+            searchSuggestions.style.display = 'none';
+        }
+    });
+    
+    searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            searchSuggestions.style.display = 'none';
+        }
+    });
+
+   /***********************/
+/* GESTION DES COMMANDES */
+/***********************/
+
+const commandeModal = document.getElementById('commandeModal');
+const commandeForm = document.getElementById('commandeForm');
+const quantiteInput = document.getElementById('quantiteCommande');
+const incrementBtn = document.getElementById('increment-qty');
+const decrementBtn = document.getElementById('decrement-qty');
+const stockAlert = document.getElementById('stockAlert');
+const submitBtn = document.getElementById('submitBtn');
+
+const closeSuccessBtn = document.getElementById('closeSuccessModal');
+
+// Initialisation des modals Bootstrap
+const bsCommandeModal = new bootstrap.Modal(commandeModal);
+const bsSuccessModal = new bootstrap.Modal(document.getElementById('successModal'));
+const bsErrorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+
+// Variables
+
+
+// Configuration du modal de commande
+commandeModal.addEventListener('show.bs.modal', function(event) {
+    const button = event.relatedTarget;
+    const produitId = button.getAttribute('data-produit-id');
+    const produitNom = button.getAttribute('data-produit-nom');
+    const produitRef = button.getAttribute('data-produit-ref');
+    const produitPrix = parseFloat(button.getAttribute('data-produit-prix'));
+    const produitImage = button.getAttribute('data-produit-image');
+    const produitStock = parseInt(button.getAttribute('data-produit-stock'));
+    
+    document.getElementById('modalProduitId').value = produitId;
+    document.getElementById('modalProduitNom').textContent = produitNom;
+    document.getElementById('modalProduitRef').textContent = `Réf: ${produitRef}`;
+    document.getElementById('modalProduitPrix').textContent = `${produitPrix.toFixed(3)} DT`;
+    document.getElementById('modalProduitImage').src = produitImage;
+    document.getElementById('modalProduitImage').alt = produitNom;
+    document.getElementById('stockDisponible').textContent = `Stock: ${produitStock}`;
+    
+    currentProduitPrix = produitPrix;
+    quantiteInput.setAttribute('max', produitStock);
+    quantiteInput.value = 1;
+    updateTotalPrice();
+    checkStock();
+});
+
+    const totalPriceValue = document.getElementById('totalPriceValue');
+let currentProduitPrix = 0;
+document.getElementById('commandeModal').addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        currentProduitPrix = parseFloat(button.getAttribute('data-produit-prix'));
+        updateTotalPrice();
+    });
+
+// CORRECTION DES BOUTONS + ET -
+incrementBtn.addEventListener('click', function() {
+        let currentValue = parseInt(quantiteInput.value) || 0;
+        const max = parseInt(quantiteInput.getAttribute('max')) || Infinity;
+        
+        if (currentValue < max) {
+            quantiteInput.value = currentValue + 1;
+            updateTotalPrice();
+        }
+    });
+
+decrementBtn.addEventListener('click', function() {
+        let currentValue = parseInt(quantiteInput.value) || 0;
+        if (currentValue > 1) {
+            quantiteInput.value = currentValue - 1;
+            updateTotalPrice();
+        }
+    });
+// Validation en temps réel
+quantiteInput.addEventListener('input', function() {
+    const value = parseInt(this.value) || 1;
+    const max = parseInt(this.getAttribute('max')) || Infinity;
+    
+    if (value > max) {
+        this.value = max;
+    } else if (value < 1) {
+        this.value = 1;
+    }
+    updateTotalPrice();
+    updateQuantity();   
+});
+
+function updateTotalPrice() {
+    const quantite = parseInt(quantiteInput.value) || 1;
+    const total = currentProduitPrix * quantite;
+    totalPrice.textContent = `Total: ${total.toFixed(3)} DT`;
+}
+
+function checkStock() {
+    const quantite = parseInt(quantiteInput.value) || 1;
+    const maxStock = parseInt(quantiteInput.getAttribute('max')) || Infinity;
+    
+    if (quantite > maxStock) {
+        stockAlert.classList.remove('d-none');
+        submitBtn.disabled = true;
+    } else {
+        stockAlert.classList.add('d-none');
+        submitBtn.disabled = false;
+    }
+}
+
+
+function updateTotalPrice() {
+        const quantite = parseInt(quantiteInput.value) || 1;
+        const total = currentProduitPrix * quantite;
+        totalPriceValue.textContent = total.toFixed(3);
+    }
+
+// Gestion de la soumission du formulaire
+// Gestion de la soumission du formulaire
+commandeForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    
+    // Fermer le modal de commande
+    bsCommandeModal.hide();
+    
+    // Afficher le modal de choix de paiement
+    const paiementChoiceModal = new bootstrap.Modal(document.getElementById('paiementChoiceModal'));
+    paiementChoiceModal.show();
+    
+    // Stocker les données du formulaire pour plus tard
+    const formData = new FormData(commandeForm);
+    window.pendingCommandeData = {
+        idProduit: formData.get('idProduit'),
+        quantiteCommande: formData.get('quantiteCommande'),
+        _token: formData.get('_token')
+    };
+});
+
+// Gestion du choix de paiement
+document.querySelectorAll('.choix-paiement').forEach(card => {
+    card.addEventListener('click', function() {
+        const paiementType = this.getAttribute('data-paiement-type');
+        const paiementChoiceModal = bootstrap.Modal.getInstance(document.getElementById('paiementChoiceModal'));
+        
+        if (paiementType === 'espece') {
+            processEspecePayment();
+        } else if (paiementType === 'enligne') {
+            processOnlinePayment();
+        }
+    });
+});
+
+// Traitement du paiement en espèces
+async function processEspecePayment() {
+    const submitBtn = document.getElementById('submitBtn');
+    const originalBtnText = submitBtn.innerHTML;
+    
+    try {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Traitement...';
+
+        const response = await fetch(commandeForm.action, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify(window.pendingCommandeData)
+        });
+
+        const responseData = await response.json();
+
+        if (!response.ok || !responseData.success) {
+            throw new Error(responseData.message || 'Erreur lors de la commande');
+        }
+
+        document.getElementById('successMessage').textContent = responseData.message || 'Votre commande a été enregistrée avec succès';
+        bsSuccessModal.show();
+
+        // Compte à rebours pour la redirection
+        let seconds = 5;
+        const countdown = setInterval(() => {
+            document.getElementById('successCountdown').textContent = seconds;
+            seconds--;
+            
+            if (seconds < 0) {
+                clearInterval(countdown);
+                window.location.href = responseData.redirectUrl || "{{ path('app_commande_commandeFront') }}";
+            }
+        }, 1000);
+
+    } catch (error) {
+        console.error('Erreur:', error);
+        
+        document.getElementById('errorMessage').textContent = error.message;
+        bsErrorModal.show();
+        
+        let seconds = 20;
+        const countdown = setInterval(() => {
+            document.getElementById('errorCountdown').textContent = seconds;
+            seconds--;
+            
+            if (seconds < 0) {
+                clearInterval(countdown);
+                bsErrorModal.hide();
+            }
+        }, 1000);
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnText;
+    }
+}
+
+
+async function processOnlinePayment() {
+    const log = (...args) => console.log('[Payment]', ...args);
+    log('Début du processus');
+
+    const btn = document.getElementById('submitBtn');
+    const originalText = btn.innerHTML;
+    
+    try {
+        // 1. Préparation
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Initialisation...';
+
+        // 2. Récupération des données
+        const productId = document.getElementById('modalProduitId')?.value;
+        const quantity = document.getElementById('quantiteCommande')?.value || 1;
+        
+        if (!productId) throw new Error('ID produit manquant');
+        log('Données:', {productId, quantity});
+
+        // 3. Construction de la requête
+        const url = '/api/payment/create-session';
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+                product_id: productId,
+                quantity: quantity
+            })
+        };
+        log('Requête préparée:', {url, options});
+
+        // 4. Envoi de la requête
+        const response = await fetch(url, options);
+        log('Réponse reçue', response);
+
+        if (!response.ok) {
+            const error = await response.text();
+            throw new Error(`Erreur serveur (${response.status}): ${error}`);
+        }
+
+        const data = await response.json();
+        log('Données reçues:', data);
+
+        if (!data?.id) throw new Error('ID de session manquant');
+
+        // 5. Redirection Stripe
+        if (typeof Stripe === 'undefined') {
+            throw new Error('Bibliothèque Stripe non chargée');
+        }
+
+        const stripe = Stripe('{{ stripe_public_key }}');
+        log('Initialisation Stripe OK');
+
+        const result = await stripe.redirectToCheckout({
+            sessionId: data.id
+        });
+        log('Redirection Stripe:', result);
+
+        if (result.error) throw result.error;
+
+    } catch (error) {
+        log('ERREUR:', error);
+        alert(`Échec du paiement : ${error.message}`);
+        
+        // Réafficher le modal
+        const modal = new bootstrap.Modal(document.getElementById('paiementChoiceModal'));
+        modal.show();
+
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
+}
+    // Redirection après succès
+    closeSuccessBtn.addEventListener('click', function() {
+        window.location.href = "{{ path('app_commande_commandeFront') }}";
+    });
+    
+    document.getElementById('successModal').addEventListener('hidden.bs.modal', function() {
+        window.location.href = "{{ path('app_commande_commandeFront') }}";
+    });
+
+
+    /***********************/
+    /* INITIALISATION */
+    /***********************/
+    
+    // Applique les filtres au chargement
+    applyAllFilters();
+});
+
+</script>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script src="{{ asset('js/payment.js') }}"></script>
+
+<style>
+/* Styles pour la sidebar de filtrage */
+.sidebar {
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    background-color: #f8f9fa;
+}
+
+.range-slider {
+    padding: 20px 0;
+}
+
+.form-range {
+    width: 100%;
+    margin: 10px 0;
+}
+
+.form-check {
+    margin-bottom: 8px;
+}
+
+/* Styles pour la recherche */
+.search-container {
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto 2rem;
+}
+
+#searchInput {
+    padding-left: 3rem;
+    border-radius: 50px;
+    border: 1px solid #dee2e6;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+#searchInput:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.1);
+    outline: none;
+}
+
+#searchSuggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: white;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    max-height: 350px;
+    overflow-y: auto;
+}
+
+.dropdown-item {
+    transition: all 0.2s;
+    border-bottom: 1px solid #f8f9fa !important;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+    transform: translateX(5px);
+}
+
+/* Animation de surbrillance */
+@keyframes highlight {
+    0% { background-color: rgba(255, 235, 59, 0); }
+    50% { background-color: rgba(255, 235, 59, 0.3); }
+    100% { background-color: rgba(255, 235, 59, 0); }
+}
+
+/* Styles des produits */
+.product-card .item-wrapper {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+}
+
+.product-card:hover .item-wrapper {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.product-image {
+    transition: transform 0.5s ease;
+}
+
+.product-card:hover .product-image {
+    transform: scale(1.05);
+}
+
+/* Styles pour les modals améliorés */
+.bg-gradient-success {
+    background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+}
+
+.bg-gradient-danger {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+}
+
+.modal-content {
+    border-radius: 0.8rem;
+    overflow: hidden;
+}
+
+.modal-header {
+    padding: 1.2rem 1.5rem;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    padding: 1rem 1.5rem;
+    background-color: #f8f9fa;
+}
+
+.alert {
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+}
+
+/* Animation d'apparition */
+@keyframes fadeInScale {
+    0% { opacity: 0; transform: scale(0.95); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+.modal.show .modal-dialog {
+    animation: fadeInScale 0.3s ease-out forwards;
+}
+
+/* Animation des modals */
+.modal.fade .modal-dialog {
+    transition: transform 0.3s ease-out, opacity 0.3s ease;
+    transform: translateY(-50px);
+    opacity: 0;
+}
+
+.modal.show .modal-dialog {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* Icônes */
+.fa-check-circle, .fa-exclamation-circle {
+    animation: bounceIn 0.5s;
+}
+
+@keyframes bounceIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Styles spécifiques pour les boutons + et - */
+.input-group button {
+    width: 40px;
+    font-weight: bold;
+}
+
+#quantiteCommande {
+    font-weight: bold;
+    text-align: center;
+}
+
+#totalPrice {
+    font-weight: bold;
+    color: #4c6e9f;
+    font-size: 1.1rem;
+}
+
+.stock-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-weight: 500;
+}
+
+.in-stock {
+    background-color: #0a833c;
+    color: white;
+}
+
+.out-of-stock {
+    background-color: #c12110;
+    color: white;
+}
+
+/* Styles responsives */
+@media (max-width: 768px) {
+    .sidebar {
+        height: auto;
+        position: relative;
+    }
+    
+    #searchInput {
+        padding-left: 2.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .product-image {
+        height: 200px;
+    }
+}.sidebar {
+    margin-top: 80px; /* Ajustez cette valeur selon vos besoins */
+    height: calc(100vh - 80px); /* Ajustez en fonction de la marge supérieure */
+    position: sticky;
+    top: 80px; /* Doit correspondre à la hauteur de votre navbar */
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    background-color: #f8f9fa;
+    overflow-y: auto; /* Permet le scroll si le contenu est trop long */
+}
+
+/* Pour les petits écrans */
+@media (max-width: 768px) {
+    .sidebar {
+        margin-top: 0;
+        height: auto;
+        position: relative;
+        top: 0;
+    }
+}
+
+.pinned-product {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.pinned-product .item-wrapper {
+    border: 2px solid #ffc107;
+    box-shadow: 0 5px 15px rgba(255, 193, 7, 0.3);
+}
+
+.pin-badge {
+    width: 40px;
+    height: 40px;
+    z-index: 10;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
+    transform: rotate(15deg);
+}
+
+.pin-badge img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Animation pour les produits épinglés */
+@keyframes pulse {
+    0% { transform: rotate(15deg) scale(1); }
+    50% { transform: rotate(15deg) scale(1.1); }
+    100% { transform: rotate(15deg) scale(1); }
+}
+
+.pinned-product:hover .pin-badge {
+    animation: pulse 1s ease infinite;
+}
+
+/* Badges */
+.badge.bg-success {
+    background-color: #28a745 !important;
+    padding: 0.5rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+}
+
+
+/* Responsive */
+@media (max-width: 768px) {
+    .pin-badge {
+        width: 30px;
+        height: 30px;
+    }
+    
+    .pinned-product .item-wrapper {
+        border-width: 1px;
+    }
+}
+/* Boutons devise */
+.btn-group .btn-outline-secondary {
+    padding: 0.25rem;
+    border-radius: 0;
+}
+
+.btn-group .btn-outline-secondary:first-child {
+    border-radius: 0.25rem 0 0 0.25rem;
+}
+
+.btn-group .btn-outline-secondary:last-child {
+    border-radius: 0 0.25rem 0.25rem 0;
+}
+
+.btn-group .btn-outline-secondary.active {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+.btn-group img {
+    vertical-align: middle;
+}
+
+
+</style>
+{% endblock %}

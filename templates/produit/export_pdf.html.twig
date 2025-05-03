@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des produits - MatchMate</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        h1 { color: #0E777D; text-align: center; }
+        .header { margin-bottom: 20px; }
+        .footer { margin-top: 30px; text-align: right; font-size: 0.8em; color: #666; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background-color: #0E777D; color: white; padding: 10px; text-align: left; }
+        td { padding: 8px; border-bottom: 1px solid #ddd; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .badge { padding: 3px 8px; border-radius: 10px; font-size: 0.8em; }
+        .bg-gradient-success { background-color: #2dce89; color: white; }
+        .bg-gradient-danger { background-color: #f5365c; color: white; }
+        .logo { text-align: center; margin-bottom: 20px; }
+        .logo img { max-height: 80px; }
+    </style>
+</head>
+<body>
+    <div class="logo">
+        <h1>MatchMate</h1>
+        <p>Liste des produits</p>
+    </div>
+    
+    <div class="header">
+        <p><strong>Date d'export :</strong> {{ date_export|date('d/m/Y H:i') }}</p>
+        <p><strong>Nombre de produits :</strong> {{ produits|length }}</p>
+    </div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Référence</th>
+                <th>Produit</th>
+                <th class="text-right">Prix</th>
+                <th class="text-center">Stock</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for produit in produits %}
+            <tr>
+                <td>{{ produit.refProduit }}</td>
+                <td>{{ produit.nomProduit }}</td>
+                <td class="text-right">{{ produit.prixProduit|number_format(2, ',', ' ') }} DT</td>
+                <td class="text-center">
+                    <span class="badge bg-gradient-{{ produit.quantiteProduit > 0 ? 'success' : 'danger' }}">
+                        {{ produit.quantiteProduit }}
+                    </span>
+                </td>
+                <td>{{ produit.descriptionProduit|slice(0, 50) }}{% if produit.descriptionProduit|length > 50 %}...{% endif %}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5" class="text-center">Aucun produit trouvé</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <div class="footer">
+        <p>Export généré par MatchMate - {{ date_export|date('d/m/Y H:i') }}</p>
+    </div>
+</body>
+</html>

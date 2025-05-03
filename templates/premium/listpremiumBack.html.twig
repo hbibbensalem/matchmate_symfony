@@ -1,0 +1,206 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block title %}Joueurs Premium - Régimes{% endblock %}
+
+{% block main_content %}
+    <!-- En-tête avec l'image -->
+    <div class="header-image"></div>
+
+    <div class="container-fluid py-4">
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                   <div class="welcome-message">
+                    Liste des joueurs premium<i class="fas fa-crown"></i>
+                </div>
+                    <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+                        <a href="{{ path('app_regime_dashboard') }}" class="btn btn-custom btn-sm">
+                            <i class="fas fa-list"></i> Liste des régimes
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Barre de recherche placée au-dessus du tableau -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="input-group input-group-outline mb-2">
+                    <span class="input-group-text text-body"><i class="fas fa-search" aria-hidden="true"></i></span>
+                    <input type="text" id="searchInput" class="form-control form-control-custom" placeholder="Rechercher (nom, prénom ou email)...">
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card mb-4">
+                    <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6>Liste des joueurs premium</h6>
+                            <p class="text-sm mb-0">
+                                <i class="fa fa-users text-info"></i>
+                                <span class="font-weight-bold" id="userCount">{{ users|length }}</span> joueurs premium
+                            </p>
+                        </div>
+                    </div>
+                    <div class="card-body px-0 pt-0 pb-2">
+                        <div class="table-responsive p-0">
+                            <table class="table align-items-center mb-0">
+                                <thead>
+                                    <th>ID</th>
+                                    <th><i class="fas fa-user"></i> Nom & Prénom</th>
+                                    <th><i class="fas fa-ruler-vertical"></i> Taille</th>
+                                    <th><i class="fas fa-weight"></i> Poids</th>
+                                    <th><i class="fas fa-tape"></i> Tour de taille</th>
+                                    <th><i class="fas fa-utensils"></i> Régime</th>
+                                    <th>Suivi</th>
+                                </tr>
+                                </thead>
+                                <tbody id="userTableBody">
+                                    {% for user in users %}
+                                        <tr class="user-row" data-search="{{ user.nomUser|lower }} {{ user.prenomUser|lower }}">
+                                            <td>{{ user.idUser }}</td>
+                                            <td>
+                                                <strong>{{ user.nomUser }} {{ user.prenomUser }}</strong><br>
+                                                <small class="text-muted">{{ user.emailUser }}</small><br>
+                                                {% if user.IsPremium == '1' %}
+                                                    <span class="badge bg-gradient-warning">Premium</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {{ user.taille ?: '<span class="text-danger">Non renseigné</span>'|raw }} cm
+                                            </td>
+                                            <td>
+                                                {{ user.poids ?: '<span class="text-danger">Non renseigné</span>'|raw }} kg
+                                            </td>
+                                            <td>
+                                                {{ user.Tour_de_taille ?: '<span class="text-danger">Non renseigné</span>'|raw }} cm
+                                            </td>
+                                            <td>
+                                                {% if user.regimes|length > 0 %}
+                                                    <div class="d-flex align-items-center">
+                                                        <a href="{{ path('app_regime_dashboard', {'id': user.idUser }) }}" class="btn btn-outline-success btn-sm btn-fixed-width mb-2 me-2">
+                                                            <i class="fas fa-eye"></i> Voir
+                                                        </a>
+                                                        <span class="text-success"><i class="fas fa-check-circle"></i> {{ user.regimes|length }}</span>
+                                                    </div>
+                                                {% else %}
+                                                    <a href="{{ path('app_regime_new', {'id': user.idUser }) }}" class="btn btn-outline-danger btn-sm btn-fixed-width mb-2 me-2">
+                                                        <i class="fas fa-plus"></i> Ajouter
+                                                    </a>
+                                                    <span class="text-danger"><i class="fas fa-times-circle"></i> Aucun</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if user.suivis|length > 0 %}
+                                                    <div class="d-flex align-items-center">
+                                                        <a href="{{ path('app_suivi_list_by_user_back', {'id': user.idUser }) }}" class="btn btn-outline-success btn-sm btn-fixed-width mb-2 me-2">
+                                                            <i class="fas fa-eye"></i> Voir
+                                                        </a>
+                                                        <span class="text-success ms-2">
+                                                            <i class="fas fa-check-circle"></i> {{ user.suivis|length }}
+                                                        </span>
+                                                    </div>
+                                                {% else %}
+                                                    <span class="text-muted"><i class="fas fa-info-circle"></i> Indisponible</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="7" class="text-center text-muted">Aucun joueur premium trouvé.</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const userRows = document.querySelectorAll('tbody tr');
+        const userCount = document.getElementById('userCount');
+
+        // Recherche dans la table
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            let visibleCount = 0;
+
+            userRows.forEach(row => {
+                const searchData = row.textContent.toLowerCase();
+                if (searchData.includes(searchTerm)) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            userCount.textContent = visibleCount;
+        });
+    });
+</script>
+{% endblock %}
+
+{% block stylesheets %}
+    <style>
+        .header-image {
+            width: 100%;
+            height: 280px;
+            background-image: url('https://images.unsplash.com/photo-1504674900247-0877df9cc836');
+            background-size: cover;
+            background-position: center;
+            border-radius: 20px;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+         
+        .welcome-message {
+    background-color: #f0f8f7; /* Couleur de fond douce (gris clair/bleu pâle) */
+    color: #0c666a; /* Couleur du texte (la même que celle du bouton) */
+    padding: 15px 20px; /* Espacement autour du texte */
+    border-radius: 10px; /* Coins arrondis */
+    font-size: 18px; /* Taille de police pour la lisibilité */
+    font-weight: 600; /* Texte légèrement en gras */
+    text-align: center; /* Centrer le texte */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ombre douce autour du message */
+    margin-bottom: 20px; /* Espacement en bas */
+}
+        /* Bouton de liste de régimes */
+        .btn-custom {
+            background-color: #0c666a;  /* Couleur verte douce */
+            color: white;
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-custom:hover {
+            background-color: #0c666a;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Barre de recherche */
+        .form-control-custom {
+            border-radius: 25px;
+            border: 1px solid #0c666a;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding-left: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control-custom:focus {
+            border-color: #689f38;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+{% endblock %}

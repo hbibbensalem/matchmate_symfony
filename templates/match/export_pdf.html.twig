@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        h1 { color: #333; text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .text-center { text-align: center; }
+        .badge {
+            display: inline-block;
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .bg-gradient-success { background-color: #28a745; color: white; }
+        .bg-gradient-danger { background-color: #dc3545; color: white; }
+        .bg-gradient-warning { background-color: #ffc107; color: black; }
+    </style>
+</head>
+<body>
+    <h1>{{ title }}</h1>
+    <p class="text-center">Généré le {{ "now"|date("d/m/Y H:i") }}</p>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Organisateur</th>
+                <th>Date & Heure</th>
+                <th>Localisation</th>
+                <th>Terrain</th>
+                <th>Sport</th>
+                <th>Participants</th>
+                <th>Statut</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for match in matchs %}
+            <tr>
+                <td>{{ match.id }}</td>
+                <td>{{ match.id_user.nomUser }} {{ match.id_user.prenomUser }}</td>
+                <td>
+                    {{ match.date|date('d/m/Y') }}<br>
+                    {{ match.heure|date('H:i') }}
+                </td>
+                <td>{{ match.localisation }}</td>
+                <td>{{ match.terrain }}</td>
+                <td>{{ match.typesport }}</td>
+                <td>{{ match.listinscris|length }}/{{ match.nb_personne }}</td>
+                <td>
+                    <span class="badge bg-gradient-{{ match.statut == 'Validé' ? 'success' : (match.statut == 'Annulé' ? 'danger' : 'warning') }}">
+                        {{ match.statut }}
+                    </span>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="8" class="text-center">Aucun match trouvé</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

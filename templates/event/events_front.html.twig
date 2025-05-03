@@ -1,0 +1,467 @@
+{% extends 'baseFront.html.twig' %}
+
+{% block title %}Événements Sportifs | MatchMate{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    /* Style personnalisé */
+    .event-section {
+        margin-top: 80px; /* Espace sous la navbar */
+    }
+    
+    .event-card {
+        transition: all 0.3s ease;
+        border-radius: 12px;
+        border: 3px solid #168D8D;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+        animation: fadeInUp 0.5s ease forwards;
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .event-card:hover {
+        transform: translateY(-5px) scale(1.02);
+        box-shadow: 0 10px 20px rgba(22, 141, 141, 0.2);
+        border-color: #10888D;
+    }
+    
+    .event-image-wrapper {
+        height: 200px;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .event-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    
+    .event-card:hover .event-image {
+        transform: scale(1.1);
+    }
+    
+    .event-image-placeholder {
+        height: 100%;
+        width: 100%;
+        background-color: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .event-image-placeholder i {
+        color: #168D8D;
+        font-size: 3rem;
+    }
+    
+    .card-footer {
+        border-top: 1px solid rgba(22, 141, 141, 0.1);
+        background-color: rgba(22, 141, 141, 0.05);
+    }
+    
+    .search-box {
+        border: 2px solid #168D8D;
+        border-radius: 30px;
+        overflow: hidden;
+    }
+    
+    .search-box input {
+        border: none;
+        box-shadow: none;
+    }
+    
+    .search-box button {
+        background-color: #168D8D;
+        color: white;
+        border: none;
+    }
+    
+    .section-title {
+        color: #168D8D;
+        position: relative;
+        padding-bottom: 15px;
+    }
+    
+    .section-title:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 3px;
+        background-color: #168D8D;
+    }
+    
+    /* Animation delay pour les cartes */
+    .event-card:nth-child(1) { animation-delay: 0.1s; }
+    .event-card:nth-child(2) { animation-delay: 0.2s; }
+    .event-card:nth-child(3) { animation-delay: 0.3s; }
+    .event-card:nth-child(4) { animation-delay: 0.4s; }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="py-5 event-section" style="background-color: #f8f9fa;">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <h2 class="section-title display-5 fw-bold">Événements Sportifs</h2>
+                <p class="lead text-muted">Découvrez et participez aux prochains événements de sports de raquette</p>
+            </div>
+        </div>
+
+        <!-- Filtres et recherche -->
+        <div class="row mb-4">
+            <div class="col-md-8 mx-auto">
+                <div class="input-group search-box">
+                    <input type="text" id="searchEvents" class="form-control form-control-lg" placeholder="Rechercher un événement...">
+                    <button class="btn" type="button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Cartes des événements -->
+        <div class="row g-4" id="eventsContainer">
+            {% for event in events %}
+            <div class="col-lg-4 col-md-6">
+                <div class="card event-card h-100">
+                    <!-- Badge de statut -->
+                    <div class="position-absolute top-0 end-0 m-2">
+                        <span class="badge {% if event.date < date() %}bg-secondary{% else %}" style="background-color: #168D8D"{% endif %}">
+                            {% if event.date < date() %}Terminé{% else %}À venir{% endif %}
+                        </span>
+                    </div>
+                    
+                    <!-- Image de l'événement -->
+                    <div class="event-image-wrapper">
+                        {% if event.imageUrl %}
+                            <img src="{{ event.imageUrl }}" class="event-image" alt="{{ event.titre }}" loading="lazy">
+                        {% else %}
+                            <div class="event-image-placeholder">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="card-body">
+                        <!-- Titre et date -->
+                        <h5 class="card-title">{{ event.titre }}</h5>
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-calendar-day me-2" style="color: #168D8D"></i>
+                            <small class="text-muted">{{ event.date|date('d/m/Y H:i') }}</small>
+                        </div>
+                        
+                        <!-- Lieu -->
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-map-marker-alt me-2" style="color: #168D8D"></i>
+                            <small class="text-muted location">{{ event.lieu }}</small>
+                        </div>
+                        
+                        <!-- Description courte -->
+                        <p class="card-text text-muted mb-3">{{ event.description|slice(0, 100) }}...</p>
+                        
+                        <!-- Capacité et participants -->
+                        <div class="progress mb-3" style="height: 6px;">
+                            <div class="progress-bar" 
+                                 role="progressbar" 
+                                 style="width: {{ participationPercentage|default(0) }}%; background-color: #168D8D" 
+                                 aria-valuenow="{{ participationPercentage|default(0) }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100"></div>
+                        </div>
+                        <small class="text-muted d-block mb-3 participants-count">
+                            {{ event.participations|length }} / {{ event.capacite }} participants
+                        </small>
+                    </div>
+                    
+                    {# Dans event/index.html.twig #}
+<div class="card-footer bg-transparent d-flex justify-content-between">
+    <a href="{{ path('app_event_details', {'id': event.idevent}) }}" class="btn btn-sm btn-outline-primary">
+        <i class="fas fa-info-circle me-1"></i> Détails
+    </a>
+    
+    <form method="post" action="{{ path('app_event_participation', {'id_event': event.idevent}) }}">
+        <input type="hidden" name="_token" value="{{ csrf_token('participate' ~ event.idevent) }}">
+        <button type="submit" 
+                class="btn btn-sm {{ event.participations|length >= event.capacite ? 'btn-secondary disabled' : 'btn-success' }}">
+            <i class="fas fa-{{ event.participations|length >= event.capacite ? 'times' : 'plus' }} me-1"></i>
+            {{ event.participations|length >= event.capacite ? 'Complet' : 'Participer' }}
+        </button>
+    </form>
+</div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Aucun événement prévu pour le moment
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Modal pour les détails de l'événement -->
+<div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #168D8D; color: white">
+                <h5 class="modal-title" id="eventModalLabel">Détails de l'événement</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="eventModalBody">
+                <!-- Contenu chargé via AJAX -->
+                <div class="text-center py-5">
+                    <div class="spinner-border" style="color: #168D8D" role="status">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Gestion des boutons de détails
+    document.querySelectorAll('.details-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const eventId = this.getAttribute('data-event-id');
+            fetch(`/event/${eventId}/details`)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('eventModalBody').innerHTML = html;
+                })
+                .catch(error => {
+                    document.getElementById('eventModalBody').innerHTML = `
+                        <div class="alert alert-danger">
+                            Une erreur s'est produite lors du chargement des détails de l'événement.
+                        </div>
+                    `;
+                    console.error('Error loading event details:', error);
+                });
+        });
+    });
+
+    // Gestion des participations
+    document.querySelectorAll('.participate-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const eventId = this.getAttribute('data-event-id');
+            const url = this.getAttribute('data-url');
+            const button = this;
+
+            // Vérifiez que l'ID de l'événement est défini
+            if (!eventId) {
+                console.error('Event ID is missing on the button.');
+                return;
+            }
+
+          
+         
+        });
+    });
+
+
+    // Fonction pour annuler une participation
+    function cancelParticipation() {
+        const eventId = this.getAttribute('data-event-id');
+        const button = this;
+
+        fetch(`/event/${eventId}/cancel-participation`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+           
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Mettre à jour l'interface
+                button.innerHTML = '<i class="fas fa-plus me-1"></i> Participer';
+                button.classList.remove('btn-danger');
+                button.classList.add('btn-success');
+                button.classList.remove('cancel-participation-btn');
+                button.classList.add('participate-btn');
+
+                // Mettre à jour la barre de progression
+                updateParticipationStats(eventId);
+
+                // Notification
+                showToast('Participation annulée avec succès', 'info');
+            } else {
+                showToast(data.message || 'Erreur lors de l\'annulation', 'error');
+            }
+        })
+        .catch(error => {
+            showToast('Une erreur est survenue lors de l\'annulation.', 'error');
+            console.error('Error:', error);
+        });
+    }
+
+    // Fonction pour mettre à jour les stats de participation
+    function updateParticipationStats(eventId) {
+        fetch(`/event/${eventId}/participation-stats`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const card = document.querySelector(`.card[data-event-id="${eventId}"]`);
+                    if (card) {
+                        const progressBar = card.querySelector('.progress-bar');
+                        const participantsText = card.querySelector('.participants-count');
+
+                        progressBar.style.width = `${data.participationPercentage}%`;
+
+                        if (participantsText) {
+                            participantsText.textContent = `${data.currentParticipants} / ${data.capacity} participants`;
+                        }
+
+                        // Désactiver les boutons si complet
+                        if (data.participationPercentage >= 100) {
+                            card.querySelectorAll('.participate-btn').forEach(btn => {
+                                btn.disabled = true;
+                            });
+                        }
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error updating participation stats:', error);
+            });
+    }
+
+    // Fonction pour afficher les notifications
+    function showToast(message, type) {
+        const toastContainer = document.getElementById('toastContainer') || createToastContainer();
+        const toast = document.createElement('div');
+
+        const bgColor = type === 'success' ? '#168D8D' : type === 'error' ? '#dc3545' : '#17a2b8';
+
+        toast.className = `toast show align-items-center text-white border-0`;
+        toast.style.backgroundColor = bgColor;
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        `;
+
+        toastContainer.appendChild(toast);
+
+        setTimeout(() => {
+            toast.remove();
+        }, 5000);
+    }
+
+    function createToastContainer() {
+        const container = document.createElement('div');
+        container.id = 'toastContainer';
+        container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+        container.style.zIndex = '11';
+        document.body.appendChild(container);
+        return container;
+    }
+
+    // Recherche d'événements dynamique avec debounce
+    const searchInput = document.getElementById('searchEvents');
+    if (searchInput) {
+        // Fonction de debounce
+        const debounce = (func, wait) => {
+            let timeout;
+            return (...args) => {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        };
+
+        const handleSearch = debounce(function(searchTerm) {
+            const eventCards = document.querySelectorAll('.event-card');
+            let hasResults = false;
+            const container = document.getElementById('eventsContainer');
+            
+            // Supprimer les anciens messages d'erreur
+            const existingMessages = container.querySelectorAll('.no-results-message');
+            existingMessages.forEach(msg => msg.remove());
+
+            eventCards.forEach(card => {
+                const title = card.querySelector('.card-title').textContent.toLowerCase();
+                const location = card.querySelector('.location').textContent.toLowerCase();
+                const description = card.querySelector('.card-text').textContent.toLowerCase();
+                const isMatch = title.includes(searchTerm) || 
+                               location.includes(searchTerm) || 
+                               description.includes(searchTerm);
+
+                const parentCol = card.closest('.col-lg-4');
+                if (isMatch) {
+                    parentCol.classList.remove('d-none');
+                    hasResults = true;
+                } else {
+                    parentCol.classList.add('d-none');
+                }
+            });
+
+            if (!hasResults) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'col-12 no-results-message';
+                messageDiv.innerHTML = `
+                    <div class="alert alert-info text-center mt-4">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Aucun événement trouvé pour "${searchTerm}"
+                    </div>
+                `;
+                container.appendChild(messageDiv);
+            }
+        }, 300);
+        document.querySelector('form').addEventListener('submit', function(e) {
+    const btn = this.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Génération de votre confirmation...';
+});
+
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.trim().toLowerCase();
+            if (term.length > 0) {
+                handleSearch(term);
+            } else {
+                // Réinitialiser l'affichage si la recherche est vide
+                document.querySelectorAll('.col-lg-4').forEach(col => col.classList.remove('d-none'));
+                document.querySelectorAll('.no-results-message').forEach(msg => msg.remove());
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

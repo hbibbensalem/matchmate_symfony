@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Ticket de Participation MatchMate</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 30px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .ticket-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 40px;
+            position: relative;
+            border: 3px solid #168D8D;
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36zwjjgzhhYWGMYAEYB8RmROaABADeOQ8CXl/xfgAAAABJRU5ErkJggg==');
+        }
+
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 25px;
+            border-bottom: 2px dashed #168D8D;
+        }
+
+        
+        .qr-section {
+            border: 2px dashed #168D8D;
+        }
+
+        /* Ajout du style pour l'image QR code */
+        .qr-image {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto;
+            display: block;
+            padding: 10px;
+            background: white;
+        }
+        .main-title {
+            color: #168D8D;
+            text-align: center;
+            margin: 25px 0;
+            font-size: 28px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .user-welcome {
+            text-align: center;
+            font-size: 22px;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: linear-gradient(to right, #f1f8ff 0%, #e3f2fd 100%);
+            border-radius: 8px;
+            border-left: 4px solid #168D8D;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .detail-card {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            position: relative;
+            transition: transform 0.3s ease;
+            border: 1px solid #dee2e6;
+        }
+
+        .detail-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .detail-label {
+            color: #168D8D;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-value {
+            color: #495057;
+            font-size: 15px;
+            padding-left: 28px;
+        }
+
+        .qr-section {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 2px dashed #168D8D;
+        }
+
+        .footer-note {
+            text-align: center;
+            color: #6c757d;
+            font-size: 14px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px dashed #dee2e6;
+        }
+
+        .icon {
+            width: 20px;
+            height: 20px;
+            filter: invert(38%) sepia(74%) saturate(439%) hue-rotate(142deg) brightness(91%) contrast(91%);
+        }
+
+        .watermark {
+            position: absolute;
+            opacity: 0.1;
+            font-size: 80px;
+            transform: rotate(-45deg);
+            pointer-events: none;
+            color: #168D8D;
+            top: 40%;
+            left: 10%;
+            z-index: 1;
+        }
+
+        .security-code {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #168D8D;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="ticket-container">
+        <div class="security-code">
+            #{{ event.idevent }}-{{ user.idUser|slice(0, 3) }}{{ "now"|date('His') }}
+        </div>
+
+        <h1 class="main-title">{{ event.titre|upper }}</h1>
+
+        <div class="user-welcome">
+            <i class="fas fa-user-check"></i>
+            {{ user.prenomUser }} {{ user.nomUser|upper }}
+            <div style="font-size: 16px; margin-top: 8px;">
+            </div>
+        </div>
+
+        <div class="details-grid">
+            <div class="detail-card">
+                <div class="detail-label">
+                    <i class="fas fa-calendar-alt"></i>
+                    DATE & HEURE
+                </div>
+                <div class="detail-value">{{ event.date|date('d/m/Y à H:i') }}</div>
+            </div>
+            
+            <div class="detail-card">
+                <div class="detail-label">
+                    <i class="fas fa-map-marker-alt"></i>
+                    LIEU
+                </div>
+                <div class="detail-value">{{ event.lieu }}</div>
+            </div>
+            
+          
+             
+            
+            <div class="detail-card">
+                <div class="detail-label">
+                    <i class="fas fa-mobile-alt"></i>
+                    CONTACT
+                </div>
+                <div class="detail-value">{{ user.telephoneUser }}</div>
+            </div>
+        </div>
+
+        <div class="qr-section">
+            <div class="detail-label" style="margin-bottom: 15px;">
+                <i class="fas fa-qrcode"></i>
+                SCANNEZ CE QR CODE À L'ENTRÉE
+            </div>
+            <img src="data:image/png;base64,{{ qrCode }}" class="qr-image" alt="QR Code">
+        </div>
+            <div style="background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyRpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoTWFjaW50b3NoKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDo4MjRGRTg0QzA3NjgxMUUzQkZGNDhENEJFQjM2OTcyRiIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDo4MjRGRTg0RDA3NjgxMUUzQkZGNDhENEJFQjM2OTcyRiI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOjgyNEZFODRBMDc2ODExRTNCRkY0OEQ0QkVCMzY5NzJGIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjgyNEZFODRCMDc2ODExRTNCRkY0OEQ0QkVCMzY5NzJGIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+XCpBoAAAAhFJREFUeNrs2kFKA0EQhuGajS7cuBQ38QSeQA9i3IlHcONCvIIg6EIPkEsIuBAUwY0g6EJFEA8QxJWgC0FEMK7UhaBInJnuqZ6B+QceJCHT9FPV1T0TRVGUWpOZtTd7sVf7tF/7s7/4eYl/N3kHcrM3e7V3+7Jv+7Xv+L3s7M3e7NXe7cu+7de+4/eytTd7s1d7ty/7tl/7jt/L3t7szV7t3b7s237tO34ve3uzN3u1d/uyb/u17/i97O3N3uzV3u3Lvu3XvuP3src3e7NXe7cv+7Zf+47fy97e7M1e7d2+7Nt+7Tt+L3t7szd7tXf7sm/7te/4veztzd7s1d7ty77t177j97K3N3uzV3u3L/u2X/uO38ve3uzNXu3dvuzbfu07fi97e7M3e7V3+7Jv+7Xv+L3s7c3e7NXe7cu+7de+4/eytzd7s1d7ty/7tl/7jt/L3t7szV7t3b7s237tO34ve3uzN3u1d/uyb/u17/i97O3N3uzV3u3Lvu3XvuP3src3e7NXe7cv+7Zf+47fy97e7M1e7d2+7Nt+7Tt+L3t7szd7tXf7sm/7te/4veztzd7s1d7ty77t177j97K3N3uzV3u3L/u2X/uO38ve3uzNXu3dvuzbfu07fi97e7M3e7V3+7Jv+7Xv+L3s7c3e7NXe7cu+7de+4/eytzd7s1d7ty/7tl/7jt/L3t7szV7t3b7s237tO34ve3uzN3u1d/uyb/u17/i97O3N3uzV3u3Lvu3XvuP3src3e7NXe7cv+7Zf+47fy97e7M1e7d2+7Nt+7Tt+L3t7szd7tXf7sm/7te/4veztzd7s1d7ty77t177j97K3N3uzV3u3L/u2X/uO38ve3uzNXu3dvuzbfu07fi97e7M3e7V3+7Jv+7Xv+L3s7c3e7NXe7cu+7de+4/eytzd7s1d7ty/7tl/7jt/L3t7szV7t3b7s237tO34ve3uzN3u1d/uyb/u17/i97O3N3uzV3u3Lvu3XvuP3src3e7NXe7cv+7Zf+47fy97e7M1e7d2+7Nt+7Tt+L3t7szd7tXf7sm/7te/4veztzd7s1d7ty77t177j97K3N3uzV3u3L/u2X/uO38ve3uzNXu3dvuzbfu07fi97e7M3e7V3+7Jv+7Xv+L3s7c3e7NXe7cu+7de+4/eytzd7s1d7ty/7tl/7jt/L3t7szV7t3b7s237tO34vM3v7F2AAWekV7sJwJg0AAAAASUVORK5CYII=');
+                     width: 150px;
+                     height: 150px;
+                     margin: 0 auto;
+                     border-radius: 10px;">
+        </div>
+    </div>
+
+
+        <div class="footer-note">
+            <p><i class="fas fa-exclamation-circle"></i> Présentez ce ticket avec une pièce d'identité</p>
+            <p>MatchMate - {{ "now"|date('Y') }} | <i class="fas fa-ban"></i> Toute reproduction interdite</p>
+        </div>
+
+        <div class="watermark">MATCHMATE</div>
+    </div>
+</body>
+</html>

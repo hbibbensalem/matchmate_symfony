@@ -1,0 +1,452 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block title %}Dashboard Événements{% endblock %}
+{% block current_page %}Événements{% endblock %}
+{% block page_title %}Tableau des Événements{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    /* Styles communs */
+    .view-switcher .btn {
+        border-radius: 0;
+    }
+    .view-switcher .btn:first-child {
+        border-top-left-radius: 5px;
+        border-bottom-left-radius: 5px;
+    }
+    .view-switcher .btn:last-child {
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+    }
+    
+    /* Styles pour la vue grille */
+    .grid-view .event-card {
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+    .grid-view .event-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .grid-view .event-image-container {
+        height: 180px;
+        overflow: hidden;
+        position: relative;
+    }
+    .grid-view .event-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    /* Styles pour la vue liste */
+    .list-view .table-img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 4px;
+    }
+    .list-view .url-truncate {
+        max-width: 200px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: inline-block;
+    }
+    
+    /* Styles communs */
+    .event-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 1;
+    }
+    .capacity-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 1;
+    }
+    .progress {
+        height: 6px;
+    }
+    .default-image {
+        background-color: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+    }
+    .default-image i {
+        font-size: 3rem;
+        color: #6c757d;
+    }
+    /* Styles pour la barre d'outils améliorée */
+.input-group-sm .form-control {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    border-radius: 0.2rem;
+}
+
+.input-group-sm .input-group-text {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.view-switcher .btn {
+    padding: 0.25rem 0.5rem;
+    border: 1px solid #dee2e6;
+}
+
+.view-switcher .btn.active {
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+    color: #495057;
+}
+
+.view-switcher .btn:first-child {
+    border-top-left-radius: 0.2rem !important;
+    border-bottom-left-radius: 0.2rem !important;
+}
+
+.view-switcher .btn:last-child {
+    border-top-right-radius: 0.2rem !important;
+    border-bottom-right-radius: 0.2rem !important;
+}
+
+.btn-success {
+    box-shadow: 0 1px 3px rgba(25, 135, 84, 0.2);
+    transition: all 0.2s ease;
+}
+
+.btn-success:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(25, 135, 84, 0.3);
+}
+/* Style pour l'empilement vertical */
+.flex-column {
+    gap: 0.5rem;
+}
+
+/* Ajustement des boutons de vue */
+.view-switcher .btn {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8rem;
+}
+
+/* Bouton ajouter plus visible */
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8rem;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+/* Alignement des éléments */
+.align-items-start {
+    align-items: flex-start !important;
+}
+
+/* Espacement entre les lignes */
+.gap-2 {
+    gap: 0.5rem;
+}
+</style>
+{% endblock %}
+
+{% block main_content %}
+<div class="container-fluid py-4">
+    <!-- Messages flash -->
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+    
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+
+    <div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-start">
+                    <!-- Titre et compteur -->
+                    <div>
+                        <h5 class="mb-0">Gestion des événements</h5>
+                        <p class="text-sm mb-0 text-muted">
+                            <i class="fas fa-calendar-check me-1"></i>
+                            <span class="font-weight-bold" id="eventCount">{{ events|length }}</span> événements trouvés
+                        </p>
+                          <div 
+                        <!-- Première ligne : Barre de recherche -->
+                        <div class="input-group input-group-sm" style="width: 200px;">
+                             <!-- Bouton d'ajout -->
+                            <a href="{{ path('app_event_ajout') }}" class="btn btn-sm btn-success" 
+                               title="Ajouter un événement">
+                                <i class="fas fa-plus me-1"></i> Ajouter un événement
+                            </a>
+                        </div>
+                                                </div>
+
+                        </div>
+
+                    
+                    <!-- Conteneur droit avec éléments empilés -->
+                    <div class="d-flex flex-column align-items-end gap-2">
+                       
+                        
+                        <!-- Deuxième ligne : Boutons de vue et ajout -->
+                      
+                               <div class="input-group input-group-sm" style="width: 250px;">
+                            <span class="input-group-text bg-transparent">
+                                <i class="fas fa-search text-muted"></i>
+                            </span>
+                            <input type="text" id="searchInput" class="form-control form-control-sm border-start-0" 
+                                   placeholder="Rechercher un événement...">
+                          
+                        </div>
+                          <div class="d-flex align-items-center gap-2">
+                            <!-- Boutons de vue -->
+                            <div class="btn-group btn-group-sm view-switcher border rounded">
+                                <button type="button" class="btn btn-sm btn-outline-secondary active" id="gridViewBtn" 
+                                        title="Vue grille">
+                                    <i class="fas fa-th-large"></i> Grille
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" id="listViewBtn" 
+                                        title="Vue liste">
+                                    <i class="fas fa-list"></i> Liste
+                                </button>
+                            </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    <!-- Vue Grille -->
+     
+    <div class="row grid-view" id="gridView">
+        {% for event in events %}
+        <div class="col-xl-3 col-lg-4 col-md-6 mb-4 event-item" data-search="{{ event.titre|lower }} {{ event.lieu|lower }}">
+            <div class="card event-card h-100">
+                <div class="event-image-container">
+                    {% if event.getImageUrl() %}
+                        <img src="{{ event.getImageUrl() }}" 
+                             class="event-image" 
+                             alt="{{ event.titre }}"
+                             onerror="this.onerror=null; this.src='{{ asset('build/images/default-event.jpg') }}'">
+                    {% else %}
+                        <div class="default-image">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                    {% endif %}
+                    <span class="badge bg-primary event-badge">#{{ event.idevent }}</span>
+                    <span class="badge capacity-badge {% if event.participations|length >= event.capacite %}bg-danger{% else %}bg-success{% endif %}">
+                        {{ event.participations|length }}/{{ event.capacite }}
+                    </span>
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{ event.titre }}</h5>
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-map-marker-alt text-muted me-2"></i>
+                        <span class="text-muted">{{ event.lieu }}</span>
+                    </div>
+                    <p class="card-text text-muted small flex-grow-1">{{ event.description|u.truncate(80, '...') }}</p>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <small class="text-muted">
+                            <i class="fas fa-clock me-1"></i>
+                            {{ event.date|date('d/m/Y H:i') }}
+                        </small>
+                    </div>
+                    <div class="progress mb-3">
+                        {% set progress = (event.participations|length / event.capacite) * 100 %}
+                        <div class="progress-bar {% if progress >= 100 %}bg-danger{% else %}bg-success{% endif %}" 
+                             role="progressbar" 
+                             style="width: {{ progress }}%"></div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ path('app_event_participants', {'id': event.idevent}) }}" 
+                           class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-users me-1"></i> 
+                        </a>
+                        <div class="btn-group">
+                            <a href="{{ path('app_event_edit', {'id': event.idevent}) }}" 
+                               class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form method="post" action="{{ path('app_event_delete', {'id': event.idevent}) }}" 
+                                  onsubmit="return confirm('Supprimer cet événement ?')">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ event.idevent) }}">
+                                <button class="btn btn-sm btn-outline-danger" type="submit">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                <i class="fas fa-info-circle me-2"></i>
+                Aucun événement trouvé
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Vue Liste -->
+    <div class="list-view d-none" id="listView">
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table align-items-center mb-0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Image</th>
+                            <th>Titre</th>
+                            <th>Date</th>
+                            <th>Lieu</th>
+                            <th>description</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for event in events %}
+                        <tr class="event-item" data-search="{{ event.titre|lower }} {{ event.lieu|lower }}">
+                            <td>{{ event.idevent }}</td>
+                            <td>
+                                {% if event.getImageUrl() %}
+                                    <img src="{{ event.getImageUrl() }}" 
+                                         class="table-img" 
+                                         alt="{{ event.titre }}"
+                                         onerror="this.src='{{ asset('build/images/default-event.jpg') }}'">
+                                {% else %}
+                                    <div class="table-img default-image">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </div>
+                                {% endif %}
+                            </td>
+                           
+                            <td>{{ event.titre }}</td>
+                            <td>{{ event.date|date('d/m/Y H:i') }}</td>
+                            <td>{{ event.lieu }}</td>
+                                                        <td>{{ event.description }}</td>
+
+                            <td>
+                                <span class="badge {% if event.participations|length >= event.capacite %}bg-danger{% else %}bg-success{% endif %}">
+                                    {% if event.participations|length >= event.capacite %}Complet{% else %}Disponible{% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="d-flex">
+                                    <a href="{{ path('app_event_participants', {'id': event.idevent}) }}" 
+                                       class="btn btn-sm btn-outline-primary me-2" 
+                                       title="Participants">
+                                        <i class="fas fa-users"></i> Participants
+                                    </a>
+                                    <a href="{{ path('app_event_edit', {'id': event.idevent}) }}" 
+                                       class="btn btn-sm btn-outline-secondary me-2" 
+                                       title="Modifier">
+                                        <i class="fas fa-edit"></i>Modifier
+                                    </a>
+                                    <form method="post" 
+                                          action="{{ path('app_event_delete', {'id': event.idevent}) }}" 
+                                          onsubmit="return confirm('Supprimer cet événement ?')">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ event.idevent) }}">
+                                        <button class="btn btn-sm btn-outline-danger" type="submit" title="Supprimer">
+                                            <i class="fas fa-trash"></i>Supprimer
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Basculer entre les vues
+    const gridViewBtn = document.getElementById('gridViewBtn');
+    const listViewBtn = document.getElementById('listViewBtn');
+    const gridView = document.getElementById('gridView');
+    const listView = document.getElementById('listView');
+
+    gridViewBtn.addEventListener('click', function() {
+        gridView.classList.remove('d-none');
+        listView.classList.add('d-none');
+        gridViewBtn.classList.add('active');
+        listViewBtn.classList.remove('active');
+    });
+
+    listViewBtn.addEventListener('click', function() {
+        gridView.classList.add('d-none');
+        listView.classList.remove('d-none');
+        listViewBtn.classList.add('active');
+        gridViewBtn.classList.remove('active');
+    });
+
+    // Recherche
+    const searchInput = document.getElementById('searchInput');
+    const eventItems = document.querySelectorAll('.event-item');
+    const eventCount = document.getElementById('eventCount');
+
+    searchInput.addEventListener('input', function() {
+        const term = this.value.toLowerCase();
+        let visibleCount = 0;
+
+        eventItems.forEach(item => {
+            const searchText = item.getAttribute('data-search');
+            if (searchText.includes(term)) {
+                item.style.display = '';
+                visibleCount++;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+
+        eventCount.textContent = visibleCount;
+    });
+
+    // Gestion des erreurs d'images
+    document.querySelectorAll('img').forEach(img => {
+        img.addEventListener('error', function() {
+            if (!this.hasAttribute('data-error-handled')) {
+                this.setAttribute('data-error-handled', 'true');
+                const container = this.closest('.event-image-container, td');
+                if (container) {
+                    container.innerHTML = `
+                        <div class="default-image">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                    `;
+                }
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

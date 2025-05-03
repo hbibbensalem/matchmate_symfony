@@ -1,0 +1,389 @@
+{% extends 'baseFront.html.twig' %}
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('assets/web/assets/mobirise-icons2/mobirise2.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/bootstrap/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/bootstrap/css/bootstrap-grid.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/bootstrap/css/bootstrap-reboot.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/animatecss/animate.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/dropdown/css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/socicon/css/styles.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/theme/css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/mobirise/css/mbr-additional.css') }}">
+    <style>
+        /* Style général */
+        .content-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .main-content {
+            margin-top: 120px;
+        }
+
+        /* Pagination avec flèches */
+        .pagination-buttons {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .pagination-buttons button {
+            background-color: #0c666a;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+
+        .pagination-buttons button:hover {
+            background-color: #3d8b40;
+        }
+
+        .pagination-buttons .prev, .pagination-buttons .next {
+            font-size: 18px;
+        }
+
+        .chat-container {
+            background-color: #f1f5f9;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+            width: 45%;
+        }
+
+        .chat-box {
+            height: 300px;
+            overflow-y: auto;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .chat-message {
+            margin-bottom: 15px;
+        }
+
+        .chat-input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            margin-top: 15px;
+            font-size: 16px;
+        }
+
+        .chat-button {
+            background-color: #3d8b40;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+
+        .chat-button:hover {
+            background-color: #0c666a;
+        }
+
+        .form-container {
+            width: 45%;
+            border-radius: 15px;
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .btn-success {
+            background-color: #c74c0a;
+            border: none;
+        }
+
+        .btn-success:hover {
+            background-color: #3d8b40;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+
+        .form-container label {
+    color: orange;
+    font-weight: 600;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.form-container .form-control {
+    border: 1px solid #ccc;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 15px;
+    background-color: #fefefe;
+}
+
+.form-container .btn-success {
+    background-color: #c74c0a;
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 10px;
+}
+
+.form-container .btn-success:hover {
+    background-color: #3d8b40;
+}
+
+.form-background {
+    background-image: url('{{ asset('front/images/bc81afd26249f95f9d8ca24109a404d2.jpg') }}');
+    background-size: cover;
+    background-position: center;
+    padding: 30px;
+    border-radius: 15px;
+}
+
+.form-backgroundd {
+    background-color: #eddbc1;;
+    background-size: cover;
+    background-position: center;
+    padding: 30px;
+    border-radius: 15px;
+}
+    </style>
+{% endblock %}
+
+{% block content %}
+<body class="g-sidenav-show bg-gray-100">
+    <div class="min-height-300 bg-dark position-absolute w-100"></div>
+
+    <main class="main-content position-relative border-radius-lg ">
+        <div class="container mt-5">
+            <div class="content-container">
+                
+                <!-- Boîte de conversation -->
+                <div id="chat" class="chat-container form-backgroundd">
+                    <h4 class="text-center" style="color: #0c666a;">Votre Assistant Personnel</h4>
+                    <div class="chat-box" id="chat-box">
+                        <!-- Messages de chat -->
+                    </div>
+                    <input type="text" class="chat-input" id="chat-input" placeholder="Posez votre question..." />
+                    <button class="chat-button" id="send-button">Envoyer</button>
+                    <button class="chat-button" id="record-button" style="margin-top: 10px;">🎤 Envoyer un message vocal</button>
+                </div>
+
+                <!-- Formulaire de suivi -->
+                <div id="form" class="form-container form-background">
+                    <h4 class="text-center mb-4" style="color: #c74c0a;">Créer Votre Suivi</h4>
+                    {{ form_start(form) }}
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.id_user) }}
+                            {{ form_widget(form.id_user, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.id_user) }}
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.poids) }}
+                            {{ form_widget(form.poids, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.poids) }}
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.tour_de_taille) }}
+                            {{ form_widget(form.tour_de_taille, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.tour_de_taille) }}
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.imc) }}
+                            {{ form_widget(form.imc, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.imc) }}
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.taille) }}
+                            {{ form_widget(form.taille, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.taille) }}
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.date_suivi) }}
+                            {{ form_widget(form.date_suivi, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.date_suivi) }}
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-success">Créer </button>
+                        <button type="submit" class="btn btn-success">Modifier</button>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+            
+        </div>
+    </main>
+</body>
+
+<script>
+    function showChat() {
+        document.getElementById("chat").classList.add("active");
+        document.getElementById("form").classList.remove("active");
+    }
+
+    function showForm() {
+        document.getElementById("form").classList.add("active");
+        document.getElementById("chat").classList.remove("active");
+    }
+
+    // Afficher le chat par défaut
+    showChat();
+</script>
+
+<!-- Chatbot Script -->
+<script>
+   document.addEventListener('DOMContentLoaded', function() {
+    const chatBox = document.getElementById('chat-box');
+    const chatInput = document.getElementById('chat-input');
+    const sendButton = document.getElementById('send-button');
+    const recordButton = document.getElementById('record-button');
+
+    let mediaRecorder;
+    let audioChunks = [];
+
+    function addMessage(text, isSender) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'chat-message';
+        messageDiv.style.textAlign = isSender ? 'right' : 'left';
+        messageDiv.style.color = isSender ? '#0c666a' : '#3d8b40';
+        messageDiv.textContent = text;
+        chatBox.appendChild(messageDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function sendMessage() {
+        const message = chatInput.value.trim();
+        if (message === '') return;
+        addMessage('Vous: ' + message, true);
+        chatInput.value = '';
+
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'chat-message';
+        loadingDiv.textContent = 'L\'IA réfléchit...';
+        chatBox.appendChild(loadingDiv);
+
+        fetch('/suivi/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: message }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            chatBox.removeChild(loadingDiv);
+            if (data.reply) {
+                addMessage('IA: ' + data.reply, false);
+            } else if (data.error) {
+                addMessage('Erreur: ' + data.error, false);
+            }
+        })
+        .catch(error => {
+            chatBox.removeChild(loadingDiv);
+            addMessage('Erreur de connexion au serveur IA', false);
+            console.error('Error:', error);
+        });
+    }
+
+    function startRecording() {
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(stream => {
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+
+                mediaRecorder.addEventListener("dataavailable", event => {
+                    audioChunks.push(event.data);
+                });
+
+                mediaRecorder.addEventListener("stop", () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    sendAudio(audioBlob);
+                });
+
+                mediaRecorder.start();
+                recordButton.textContent = "⏹️ Arrêter l'enregistrement";
+                recordButton.style.backgroundColor = "#c74c0a";
+            })
+            .catch(error => {
+                console.error('Erreur lors de l\'enregistrement audio:', error);
+            });
+    }
+
+    function stopRecording() {
+        if (mediaRecorder) {
+            mediaRecorder.stop();
+            recordButton.textContent = "🎤 Envoyer un message vocal";
+            recordButton.style.backgroundColor = "#3d8b40";
+        }
+    }
+
+    function sendAudio(audioBlob) {
+        const formData = new FormData();
+        formData.append('audio', audioBlob, 'audio.webm');
+
+        addMessage('Vous (audio envoyé)', true);
+
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'chat-message';
+        loadingDiv.textContent = 'L\'IA transcrit votre audio...';
+        chatBox.appendChild(loadingDiv);
+
+        fetch('/suivi/transcribe', {
+            method: 'POST',
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            chatBox.removeChild(loadingDiv);
+            if (data.transcript) {
+                chatInput.value = data.transcript;
+                sendMessage();
+            } else {
+                addMessage('Erreur de transcription.', false);
+            }
+        })
+        .catch(error => {
+            chatBox.removeChild(loadingDiv);
+            addMessage('Erreur lors de l\'envoi de l\'audio.', false);
+            console.error('Error:', error);
+        });
+    }
+
+    sendButton.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+
+    recordButton.addEventListener('click', function() {
+        if (mediaRecorder && mediaRecorder.state === "recording") {
+            stopRecording();
+        } else {
+            startRecording();
+        }
+    });
+
+    addMessage('IA: Bonjour! Comment puis-je vous aider avec votre suivi de régime aujourd\'hui?', false);
+});
+    </script>
+{% endblock %}

@@ -10,9 +10,10 @@ use Doctrine\ORM\Mapping as ORM;
 
 use Doctrine\Common\Collections\Collection;
 use App\Entity\Suivi;
+use App\Repository\UserRepository;
 
 
-#[ORM\Entity]
+#[ORM\Entity (repositoryClass: UserRepository::class)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface 
 {
 
@@ -53,6 +54,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 public function __construct()
 {
     $this->generateCustomId();
+    $this->createdAt = new \DateTime();
 }
 
 public function generateCustomId(): void
@@ -173,6 +175,15 @@ private ?float $latitude = null;
 
 #[ORM\Column(type: 'float', nullable: true)]
 private ?float $longitude = null;
+
+#[ORM\Column(type: 'datetime', nullable: true)]
+private ?\DateTimeInterface $createdAt = null;
+
+#[ORM\Column(type: 'datetime_immutable', nullable: true)]
+private ?\DateTimeInterface $lastLoginAt = null;
+
+
+
 
     public function getDescriptionUser(): ?string
     {
@@ -487,6 +498,28 @@ public function setLongitude(?float $longitude): self
 
 }
 
+public function getCreatedAt(): ?\DateTimeInterface
+{
+    return $this->createdAt;
+}
+
+public function setCreatedAt(\DateTimeInterface $createdAt): self
+{
+    $this->createdAt = $createdAt;
+    return $this;
+}
+
+public function getLastLoginAt(): ?\DateTimeInterface
+{
+    return $this->lastLoginAt;
+}
+
+public function setLastLoginAt(?\DateTimeInterface $lastLoginAt): self
+{
+    $this->lastLoginAt = $lastLoginAt;
+    return $this;
+}
+
 
     #[ORM\OneToMany(mappedBy: "id_user", targetEntity: Event::class)]
     private Collection $events;
@@ -524,6 +557,33 @@ public function setLongitude(?float $longitude): self
     #[ORM\OneToMany(mappedBy: "id_user", targetEntity: Regime::class)]
     private Collection $regimes;
 
+    public function getRegimes(): Collection
+{
+    return $this->regimes;
+}
+
+public function addRegime(Regime $regime): self
+{
+    if (!$this->regimes->contains($regime)) {
+        $this->regimes[] = $regime;
+        $regime->setIdUser($this); // Assure-toi que Regime::setIdUser existe
+    }
+
+    return $this;
+}
+
+public function removeRegime(Regime $regime): self
+{
+    if ($this->regimes->removeElement($regime)) {
+        // set the owning side to null (unless already changed)
+        if ($regime->getIdUser() === $this) {
+            $regime->setIdUser($this);
+        }
+    }
+
+    return $this;
+}
+
     #[ORM\OneToMany(mappedBy: "id_user", targetEntity: Commande::class)]
     private Collection $commandes;
 
@@ -535,4 +595,33 @@ public function setLongitude(?float $longitude): self
 
     #[ORM\OneToMany(mappedBy: "id_user", targetEntity: Suivi::class)]
     private Collection $suivis;
+
+    public function getSuivis(): Collection
+    {
+        return $this->suivis;
+    }
+    
+    // Méthode pour ajouter un suivi
+    public function addSuivi(Suivi $suivi): self
+    {
+        if (!$this->suivis->contains($suivi)) {
+            $this->suivis[] = $suivi;
+            $suivi->setIdUser($this); // Assure-toi que Suivi::setIdUser existe
+        }
+    
+        return $this;
+    }
+    
+    // Méthode pour supprimer un suivi
+    public function removeSuivi(Suivi $suivi): self
+    {
+        if ($this->suivis->removeElement($suivi)) {
+            // Assure-toi que l'association dans l'entité Suivi est bien réinitialisée
+            if ($suivi->getIdUser() === $this) {
+                $suivi->setIdUser(null);
+            }
+        }
+    
+        return $this;
+    }
 }

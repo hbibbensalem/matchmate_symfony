@@ -4,132 +4,171 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use App\Entity\Commande;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ORM\Entity]
 class Produit
 {
 
+
     #[ORM\Id]
-    #[ORM\Column(type: "integer")]
-    private int $id_produit;
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name: "id_produit", type: "integer")]
+    private ?int $idProduit = null;
 
-    #[ORM\Column(type: "string", length: 110)]
-    private string $nom_produit;
+    #[ORM\Column(name: "nom_produit", type: "string", length: 110)]
+    #[Assert\NotBlank(message: "Le nom du produit est obligatoire")]
+    #[Assert\Length(
+        min: 3,
+        max: 110,
+        minMessage: "Le nom doit faire au moins {{ limit }} caractères",
+        maxMessage: "Le nom ne peut pas dépasser {{ limit }} caractères"
+    )]
+    #[Assert\Regex(
+        pattern: "/^[a-zA-Z][a-zA-Z0-9 ]*$/",
+        message: "Le nom doit commencer par une lettre et ne peut contenir que des lettres, chiffres et espaces"
+    )]
+    private string $nomProduit;
+    
+    #[ORM\Column(name: "description_produit", type: "text")]
+    #[Assert\NotBlank(message: "La description est obligatoire")]
+    #[Assert\Length(
+        min: 10,
+        minMessage: "La description doit faire au moins {{ limit }} caractères"
+    )]
+    #[Assert\Regex(
+        pattern: "/^[\p{L}\p{N}\s.,;:!?'\"()\-@#&=+]+$/u",
+        message: "La description contient des caractères non autorisés"
+    )]
+    private string $descriptionProduit;
+    
+    #[ORM\Column(name: "prix_produit", type: "integer")]
+    #[Assert\NotBlank(message: "Le prix est obligatoire")]
+    #[Assert\PositiveOrZero(message: "Le prix ne peut pas être négatif")]
+    private int $prixProduit;
+    
+    #[ORM\Column(name: "quantite_produit", type: "integer")]
+    #[Assert\NotBlank(message: "La quantité est obligatoire")]
+    #[Assert\PositiveOrZero(message: "La quantité ne peut pas être négative")]
+    private int $quantiteProduit;
+    
+  #[ORM\Column(name: "image_produit", type: "string", length: 255)]
+private string $imageProduit;
+    
+    #[ORM\Column(name: "ref_produit", type: "string", length: 255, unique: true)]
+    private ?string $refProduit = null;
+  
+    
 
-    #[ORM\Column(type: "string", length: 110)]
-    private string $description_produit;
-
-    #[ORM\Column(type: "integer")]
-    private int $prix_produit;
-
-    #[ORM\Column(type: "integer")]
-    private int $quantite_produit;
-
-    #[ORM\Column(type: "string", length: 255)]
-    private string $image_produit;
-
-    #[ORM\Column(type: "string", length: 255)]
-    private string $ref_produit;
-
-    public function getId_produit()
+    public function getIdProduit()
     {
-        return $this->id_produit;
+        return $this->idProduit;
     }
 
-    public function setId_produit($value)
+    public function setIdProduit($value)
     {
-        $this->id_produit = $value;
+        $this->idProduit = $value;
     }
 
-    public function getNom_produit()
+    public function getNomProduit()
     {
-        return $this->nom_produit;
+        return $this->nomProduit;
     }
 
-    public function setNom_produit($value)
+    public function setNomProduit($value)
     {
-        $this->nom_produit = $value;
+        $this->nomProduit = $value;
     }
 
-    public function getDescription_produit()
+    public function getDescriptionProduit()
     {
-        return $this->description_produit;
+        return $this->descriptionProduit;
     }
 
-    public function setDescription_produit($value)
+    public function setDescriptionProduit($value)
     {
-        $this->description_produit = $value;
+        $this->descriptionProduit = $value;
     }
 
-    public function getPrix_produit()
+    public function getPrixProduit()
     {
-        return $this->prix_produit;
+        return $this->prixProduit;
     }
 
-    public function setPrix_produit($value)
+    public function setPrixProduit($value)
     {
-        $this->prix_produit = $value;
+        $this->prixProduit = $value;
     }
 
-    public function getQuantite_produit()
+    public function getQuantiteProduit()
     {
-        return $this->quantite_produit;
+        return $this->quantiteProduit;
     }
 
-    public function setQuantite_produit($value)
+    public function setQuantiteProduit($value)
     {
-        $this->quantite_produit = $value;
+        $this->quantiteProduit = $value;
     }
 
-    public function getImage_produit()
+    public function getImageProduit()
     {
-        return $this->image_produit;
+        return $this->imageProduit;
     }
 
-    public function setImage_produit($value)
+    public function setImageProduit($value)
     {
-        $this->image_produit = $value;
+        $this->imageProduit = $value;
     }
 
-    public function getRef_produit()
+    public function getRefProduit()
     {
-        return $this->ref_produit;
+        return $this->refProduit;
     }
 
-    public function setRef_produit($value)
+    public function setRefProduit($value)
     {
-        $this->ref_produit = $value;
+        $this->refProduit = $value;
     }
 
-    #[ORM\OneToMany(mappedBy: "idProduit", targetEntity: Commande::class)]
+    #[ORM\OneToMany(mappedBy: "produit", targetEntity: Commande::class)]
     private Collection $commandes;
+
+    public function __construct()
+    {
+    $this->commandes = new ArrayCollection();
+    }
+
+    public function getOrderCount(): int
+    {
+        return $this->commandes->count();
+    }
 
         public function getCommandes(): Collection
         {
             return $this->commandes;
         }
-    
         public function addCommande(Commande $commande): self
         {
             if (!$this->commandes->contains($commande)) {
-                $this->commandes[] = $commande;
-                $commande->setIdProduit($this);
+                $this->commandes->add($commande);
+                $commande->setProduit($this);
             }
-    
             return $this;
         }
-    
+        
         public function removeCommande(Commande $commande): self
         {
             if ($this->commandes->removeElement($commande)) {
-                // set the owning side to null (unless already changed)
-                if ($commande->getIdProduit() === $this) {
-                    $commande->setIdProduit(null);
+                if ($commande->getProduit() === $this) {
+                    $commande->setProduit(null);
                 }
             }
-    
             return $this;
         }
+
 }

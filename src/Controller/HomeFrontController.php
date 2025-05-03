@@ -12,7 +12,7 @@ final class HomeFrontController extends AbstractController
     public function index(): Response
     {
         return $this->render('home_front/index.html.twig', [
-            'stripe_public_key' => $_ENV['STRIPE_PUBLIC_KEY'],
+            'stripe_public_key' => $_ENV['STRIPE_PUBLIC_KEY'] ?? 'your-default-stripe-key',
             'controller_name' => 'HomeFrontController',
         ]);
     }

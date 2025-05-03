@@ -1,0 +1,135 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block title %}Joueurs Premium - Suivi des Régimes{% endblock %}
+
+
+
+{% block main_content %}
+    <!-- En-tête avec l'image -->
+    <div class="header-image"></div>
+
+    <div class="container-fluid py-4">
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    
+                    <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+                        <div class="input-group input-group-outline">
+                            <span class="input-group-text text-body"><i class="fas fa-search" aria-hidden="true"></i></span>
+                            <input type="text" id="searchInput" class="form-control" placeholder="Rechercher (nom, prénom ou email)...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card mb-4">
+                    <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6>Liste des suivis de régime</h6>
+                            <p class="text-sm mb-0">
+                                <i class="fa fa-heartbeat text-success"></i>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="card-body px-0 pt-0 pb-2">
+                        <div class="table-responsive p-0">
+                            <table class="table align-items-center mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Suivi ID</th>
+                                        <th>User Id</th>
+                                        <th>Poids (kg)</th>
+                                        <th>Taille (cm)</th>
+                                        <th>Tour de taille (cm)</th>
+                                        <th>IMC</th>
+                                        <th>Date du suivi</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for suivi in suivis %}
+                                        <tr>
+                                            <td>{{ suivi.suivi_id }}</td>
+                                            <td>{{ suivi.idUser.idUser }}</td>
+                                            <td>{{ suivi.poids }}</td>
+                                            <td>{{ suivi.taille }}</td>
+                                            <td>{{ suivi.tourDeTaille }}</td>
+                                            <td class="imc-cell">{{ suivi.imc }}</td>
+                                            <td class="date-cell">{{ suivi.dateSuivi ? suivi.dateSuivi|date('Y-m-d') : '' }}</td>
+                                            <td>
+                                                <form method="post" action="{{ path('app_suivi_delete', { suivi_id: suivi.suivi_id }) }}" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce suivi ?');">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ suivi.suivi_id) }}">
+                                                    <button type="submit" class="btn btn-link text-danger p-0 ms-2">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="8" class="text-center">Aucun suivi enregistré</td>
+                                        </tr>
+                                    {% endfor %}
+                                    
+                                </tbody>
+                               
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mb-3">
+            <a href="{{ path('app_regime_listpremium') }}" class="btn btn-outline-danger">
+                <i class="fas fa-arrow-left"></i> Retour
+            </a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const userRows = document.querySelectorAll('tbody tr');
+        const userCount = document.getElementById('userCount');
+
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            let visibleCount = 0;
+
+            userRows.forEach(row => {
+                const searchData = row.textContent.toLowerCase();
+                if (searchData.includes(searchTerm)) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            if (userCount) {
+                userCount.textContent = visibleCount;
+            }
+        });
+    });
+</script>
+{% endblock %}
+
+{% block stylesheets %}
+    <style>
+        .header-image {
+            width: 100%;
+            height: 280px;
+            background-image: url('https://images.unsplash.com/photo-1504674900247-0877df9cc836');
+            background-size: cover;
+            background-position: center;
+            border-radius: 20px;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+    </style>
+{% endblock %}

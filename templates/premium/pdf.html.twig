@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joueurs Premium - Régimes</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: #fffaf5;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #10888D;
+            color: white;
+        }
+        td {
+            vertical-align: middle;
+        }
+        .badge {
+            padding: 3px 8px;
+            background-color: #fbcf33;
+            color: white;
+            border-radius: 12px;
+        }
+        .text-success {
+            color: #28a745;
+        }
+        .text-danger {
+            color: #e74c3c;
+        }
+        h1 {
+            text-align: center;
+            color: #10888D;
+        }
+    </style>
+</head>
+<body>
+    <h1>Liste des Joueurs Premium</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nom & Prénom</th>
+                <th>Taille (cm)</th>
+                <th>Poids (kg)</th>
+                <th>Tour de Taille (cm)</th>
+               
+            </tr>
+        </thead>
+        <tbody>
+            {% for player in players %}
+            <tr>
+                <td>{{ player.idUser }}</td>
+                <td>{{ player.nomUser }} {{ player.prenomUser }} <br><small>{{ player.emailUser }}</small></td>
+                <td>{{ player.taille ?: 'Non renseigné' }} cm</td>
+                <td>{{ player.poids ?: 'Non renseigné' }} kg</td>
+                <td>{{ player.Tour_de_taille ?: 'Non renseigné' }} cm</td>
+               
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

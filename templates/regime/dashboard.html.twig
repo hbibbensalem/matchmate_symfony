@@ -1,0 +1,245 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block title %}Joueurs Premium - Régimes{% endblock %}
+
+{% block main_content %}
+    <!-- En-tête avec l'image -->
+    <div class="header-image"></div>
+
+    <div class="container-fluid py-4">
+      <div class="row mb-4">
+          <div class="col-12">
+              <div class="d-flex justify-content-between align-items-center">
+                 <div class="welcome-message">
+                  Liste des joueurs premium<i class="fas fa-crown"></i>
+              </div>
+                  <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+                      <a href="{{ path('app_regime_listpremium') }}" class="btn btn-custom btn-sm">
+                          <i class="fas fa-list"></i> Liste des joueurs premium
+                      </a>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="welcome-message">
+                    Bienvenue dans les détails de votre régime personnalisé 🥗 
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header pb-0 card-header-centered">
+                        <h6>Informations sur le Régime</h6>
+                    </div>
+                    <div class="card-body px-0 pt-0 pb-2">
+                        <div class="table-responsive p-3">
+                            <input type="text" id="searchInput" class="form-control mb-3" placeholder="Rechercher...">
+                            <table class="table align-items-center mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Regime ID</th>
+                                        <th>User ID</th>
+                                        <th>Objectif</th>
+                                        <th>Calories journalières</th>
+                                        <th>Protéines</th>
+                                        <th>Glucides</th>
+                                        <th>Lipides</th>
+                                        <th>Date début</th>
+                                        <th>Date fin</th>
+                                        <th>Statut</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for regime in regimes %}
+                                        <tr>
+                                            <td>{{ regime.regimeId }}</td>
+                                            <td>{{ regime.idUser.idUser }}</td>
+                                            <td>{{ regime.objectif }}</td>
+                                            <td>{{ regime.caloriesJournalieres }}</td>
+                                            <td>{{ regime.proteines }}</td>
+                                            <td>{{ regime.glucides }}</td>
+                                            <td>{{ regime.lipides }}</td>
+                                            <td>{{ regime.dateDebut ? regime.dateDebut|date('Y-m-d') : '' }}</td>
+                                            <td>{{ regime.dateFin ? regime.dateFin|date('Y-m-d') : '' }}</td>
+                                            <td>{{ regime.statut }}</td>
+                                            <td>
+                                               
+                                                <form method="post" action="{{ path('app_regime_delete', { regime_id: regime.regimeId }) }}" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce régime ?');">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ regime.regimeId) }}">
+                                                    <button type="submit" class="btn btn-link text-danger p-0 ms-2">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistiques Graphique -->
+                <div class="card mb-4">
+                    <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+                        <h6>Statistiques des Objectifs de Régime</h6>
+                        <div class="text-sm">
+                            <i class="fa fa-info-circle text-primary"></i> Basé sur les régimes enregistrés
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        {% if regimes is not empty %}
+                            <div class="chart-container" style="height: 300px;">
+                                <canvas id="regimeStatsChart" class="chart-canvas" height="300"></canvas>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info text-center">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Aucune donnée disponible pour afficher les statistiques.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <!-- Fin Statistiques -->
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const userRows = document.querySelectorAll('tbody tr');
+
+        // Recherche dans la table
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            let visibleCount = 0;
+
+            userRows.forEach(row => {
+                const searchData = row.textContent.toLowerCase();
+                if (searchData.includes(searchTerm)) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        {% if regimes is not empty %}
+    // Génération du graphique
+    var ctx = document.getElementById('regimeStatsChart').getContext('2d');
+
+    var objectifs = {};
+
+    {% for regime in regimes %}
+        objectifs["{{ regime.objectif|e('js') }}"] = (objectifs["{{ regime.objectif|e('js') }}"] || 0) + 1;
+    {% endfor %}
+
+    var labels = Object.keys(objectifs);
+    var data = Object.values(objectifs);
+    
+    var colors = [
+        'rgba(255, 107, 0, 0.7)',
+        'rgba(14, 119, 125, 0.7)',
+        'rgba(245, 54, 92, 0.7)',
+        'rgba(32, 201, 151, 0.7)',
+        'rgba(23, 105, 255, 0.7)'
+    ];
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Nombre de régimes',
+                data: data,
+                backgroundColor: colors,
+                borderColor: colors.map(color => color.replace('0.7', '1')),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.parsed.y + ' régimes';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: { display: true, text: 'Nombre de régimes' },
+                    ticks: { precision: 0 }
+                },
+                x: {
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+{% endif %}
+
+    });
+    </script>
+{% endblock %}
+
+{% block stylesheets %}
+    <style>
+        .header-image {
+            width: 100%;
+            height: 280px;
+            background-image: url('https://images.unsplash.com/photo-1504674900247-0877df9cc836');
+            background-size: cover;
+            background-position: center;
+            border-radius: 20px;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        .welcome-message {
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-weight: 500;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .welcome-message {
+
+          background-color: #f0f8f7; 
+           color: #0c666a; 
+           padding: 15px 20px;
+           border-radius: 10px; 
+           font-size: 18px; 
+           font-weight: 600; 
+            text-align: center; 
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+            margin-bottom: 20px; 
+        }
+
+         /* Bouton de liste de régimes */
+         .btn-custom {
+            background-color: #0c666a;  /* Couleur verte douce */
+            color: white;
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+{% endblock %}

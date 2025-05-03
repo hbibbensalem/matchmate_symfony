@@ -1,0 +1,327 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block title %}Ajouter un Produit{% endblock %}
+{% block current_page %}Produits{% endblock %}
+{% block page_title %}Ajouter un nouveau produit{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    
+    <style>
+        .is-invalid {
+            border-color: #ea2c62 !important;
+        }
+        .invalid-feedback {
+            color: #ea2c62;
+            font-size: 0.8rem;
+        }
+        .was-validated .form-control:valid {
+    border-color: #28a745;}
+    .is-valid {
+            border-color: #28a745 !important;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+            padding-right: 2.25rem;
+        }
+        /* Optionnel : Style pendant la saisie */
+        .form-control:focus:valid {
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+        }
+        .generated-description {
+            transition: all 0.3s ease;
+        }
+        .generated-description small {
+            font-size: 0.75rem;
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const fields = form.querySelectorAll('input, textarea, select');
+
+            fields.forEach(field => {
+        field.addEventListener('input', function() {
+            validateField(this);
+        });
+        field.addEventListener('change', function() {
+            validateField(this);
+        });
+    });
+    function validateField(field) {
+        if (field.checkValidity()) {
+            field.classList.add('is-valid');
+            field.classList.remove('is-invalid');
+        } else {
+            field.classList.add('is-invalid');
+            field.classList.remove('is-valid');
+        }
+    }
+    
+            
+            form.addEventListener('submit', function(e) {
+                if (!form.checkValidity()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Collecte de toutes les erreurs
+                    const invalidFields = form.querySelectorAll(':invalid');
+                    let errorMessages = [];
+                    
+                    invalidFields.forEach(field => {
+                        // On évite les doublons pour le même champ
+                        if (field.validationMessage && !errorMessages.some(e => e.name === field.name)) {
+                            const label = field.labels[0]?.textContent?.trim() || 
+                                        field.getAttribute('name') || 
+                                        'Champ';
+                            errorMessages.push({
+                                name: label.replace(':', ''),
+                                message: field.validationMessage
+                            });
+                        }
+                    });
+                    
+                    // Affichage du popup avec les erreurs
+                    if (errorMessages.length > 0) {
+                        showErrorPopup(errorMessages);
+                    }
+                }
+                
+                form.classList.add('was-validated');
+            });
+            
+            function showErrorPopup(errors) {
+                let errorHtml = '<ul class="text-start">';
+                errors.forEach(error => {
+                    errorHtml += `<li><strong>${error.name}:</strong> ${error.message}</li>`;
+                });
+                errorHtml += '</ul>';
+                
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erreurs dans le formulaire',
+                    html: errorHtml,
+                    confirmButtonText: 'Je corrige',
+                    confirmButtonColor: '#ea2c62'
+                });
+            }
+            const generateDescriptionBtn = document.createElement('button');
+            generateDescriptionBtn.type = 'button';
+            generateDescriptionBtn.className = 'btn btn-sm btn-outline-primary mt-2';
+            generateDescriptionBtn.innerHTML = '<i class="fas fa-magic me-1"></i> Générer une description';
+            
+            const descriptionContainer = document.querySelector('#{{ form.descriptionProduit.vars.id }}').parentNode;
+            descriptionContainer.appendChild(generateDescriptionBtn);
+            
+            // Zone pour afficher la description générée
+            const generatedDescriptionContainer = document.createElement('div');
+            generatedDescriptionContainer.className = 'generated-description mt-3 p-3 border rounded bg-light d-none';
+            generatedDescriptionContainer.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <small class="text-muted fw-bold">Description générée:</small>
+                    <div>
+                        <button type="button" class="btn btn-sm btn-success use-description-btn me-1">
+                            <i class="fas fa-check me-1"></i> Utiliser
+                        </button>
+                        <button type="button" class="btn btn-sm btn-danger discard-description-btn">
+                            <i class="fas fa-times me-1"></i> Rejeter
+                        </button>
+                    </div>
+                </div>
+                <div class="generated-content"></div>
+            `;
+            descriptionContainer.appendChild(generatedDescriptionContainer);
+
+            // Gestion du clic sur le bouton Générer
+            generateDescriptionBtn.addEventListener('click', async function() {
+                const nomProduit = document.querySelector('#{{ form.nomProduit.vars.id }}').value;
+                const currentDescription = document.querySelector('#{{ form.descriptionProduit.vars.id }}').value;
+                
+                if (!nomProduit) {
+                    Swal.fire('Erreur', 'Veuillez d\'abord saisir le nom du produit', 'error');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('{{ path("app_generate_product_description") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({
+                            nomProduit: nomProduit,
+                            currentDescription: currentDescription
+                        })
+                    });
+
+                    if (!response.ok) throw new Error('Erreur lors de la génération');
+
+                    const data = await response.json();
+                    
+                    // Afficher la description générée
+                    generatedDescriptionContainer.querySelector('.generated-content').textContent = data.generatedDescription;
+                    generatedDescriptionContainer.classList.remove('d-none');
+                    
+                } catch (error) {
+                    Swal.fire('Erreur', 'Une erreur est survenue lors de la génération', 'error');
+                    console.error(error);
+                }
+            });
+
+            // Gestion des boutons Utiliser/Rejeter
+            generatedDescriptionContainer.querySelector('.use-description-btn').addEventListener('click', function() {
+                document.querySelector('#{{ form.descriptionProduit.vars.id }}').value = 
+                    generatedDescriptionContainer.querySelector('.generated-content').textContent;
+                generatedDescriptionContainer.classList.add('d-none');
+            });
+
+            generatedDescriptionContainer.querySelector('.discard-description-btn').addEventListener('click', function() {
+                generatedDescriptionContainer.classList.add('d-none');
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block main_content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header pb-0">
+                    <h6>Formulaire d'ajout</h6>
+                </div>
+                <div class="card-body px-4 pt-0 pb-2">
+                    {{ form_start(form, {
+                        'attr': {
+                            'class': 'p-3 needs-validation',
+                            'novalidate': 'novalidate'
+                        }
+                    }) }}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form_label(form.nomProduit, 'Nom du produit', {
+                                        'label_attr': {'class': 'form-control-label'}
+                                    }) }}
+                                    {{ form_widget(form.nomProduit, {
+                                        'attr': {
+                                            'class': 'form-control' ~ (form.nomProduit.vars.valid ? '' : ' is-invalid'),
+                                            'required': 'required'
+                                        }
+                                    }) }}
+                                    <div class="invalid-feedback">
+                                        {{ form_errors(form.nomProduit) }}
+                                    </div>
+                                    <small class="text-muted">Doit commencer par une lettre (3 caractères minimum)</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form_label(form.prixProduit, 'Prix (DT)', {
+                                        'label_attr': {'class': 'form-control-label'}
+                                    }) }}
+                                    <div class="input-group">
+                                        <span class="input-group-text">DT</span>
+                                        {{ form_widget(form.prixProduit, {
+                                            'attr': {
+                                                'class': 'form-control' ~ (form.prixProduit.vars.valid ? '' : ' is-invalid'),
+                                                'min': '0',
+                                                'required': 'required'
+                                            }
+                                        }) }}
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        {{ form_errors(form.prixProduit) }}
+                                    </div>
+                                    <small class="text-muted">Doit être positif ou zéro</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    {{ form_label(form.quantiteProduit, 'Quantité en stock', {
+                                        'label_attr': {'class': 'form-control-label'}
+                                    }) }}
+                                    {{ form_widget(form.quantiteProduit, {
+                                        'attr': {
+                                            'class': 'form-control' ~ (form.quantiteProduit.vars.valid ? '' : ' is-invalid'),
+                                            'min': '0',
+                                            'required': 'required'
+                                        }
+                                    }) }}
+                                    <div class="invalid-feedback">
+                                        {{ form_errors(form.quantiteProduit) }}
+                                    </div>
+                                    <small class="text-muted">Doit être positif ou zéro</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    {{ form_label(form.descriptionProduit, 'Description', {
+                                        'label_attr': {'class': 'form-control-label'}
+                                    }) }}
+                                    {{ form_widget(form.descriptionProduit, {
+                                        'attr': {
+                                            'class': 'form-control' ~ (form.descriptionProduit.vars.valid ? '' : ' is-invalid'),
+                                            'rows': '3',
+                                            'required': 'required'
+                                        }
+                                    }) }}
+                                    <div class="invalid-feedback">
+                                        {{ form_errors(form.descriptionProduit) }}
+                                    </div>
+                                    <small class="text-muted">Minimum 10 caractères</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    {{ form_label(form.imageProduit, 'Image du produit', {
+                                        'label_attr': {'class': 'form-control-label'}
+                                    }) }}
+                                    {{ form_widget(form.imageProduit, {
+                                        'attr': {
+                                            'class': 'form-control' ~ (form.imageProduit.vars.valid ? '' : ' is-invalid'),
+                                            'accept': 'image/jpeg,image/png,image/gif,image/jpg',
+                                        }
+                                    }) }}
+                                    <div class="invalid-feedback">
+                                        {{ form_errors(form.imageProduit) }}
+                                    </div>
+                                    <small class="text-muted">Formats acceptés: JPEG, PNG, GIF (max 1Mo)</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button type="submit" class="btn bg-gradient-primary">
+                                <i class="fas fa-save me-2"></i> Enregistrer
+                            </button>
+                            <a href="{{ path('app_produit_dashboard') }}" class="btn bg-gradient-secondary">
+                                <i class="fas fa-times me-2"></i> Annuler
+                            </a>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

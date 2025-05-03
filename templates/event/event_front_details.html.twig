@@ -1,0 +1,424 @@
+{% extends 'baseFront.html.twig' %}
+
+{% block title %}Détails de l'événement - {{ event.titre }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .event-detail-container {
+            max-width: 800px;
+            margin: 200px auto;
+            padding: 100px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .event-header {
+            border-bottom: 2px solid #168D8D;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .event-image {
+            max-height: 400px;
+            width: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .event-info-item {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .event-info-item i {
+            color: #168D8D;
+            width: 25px;
+            text-align: center;
+            margin-right: 10px;
+        }
+        .participants-progress {
+            height: 10px;
+            margin: 10px 0;
+            width: 100%;
+        }
+        .participants-count {
+            font-weight: bold;
+            color: #168D8D;
+            margin-top: 5px;
+        }
+        .btn-success {
+            background-color: #168D8D;
+            border-color: #168D8D;
+        }
+        .btn-success:hover {
+            background-color: #10888D;
+            border-color: #10888D;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div style="margin-top: 20px;"></div> <!-- Add space below the navbar -->
+<div class="event-detail-container">
+    <!-- Display the event image -->
+    <div class="event-image-container mb-4">
+                            <img src="{{ event.imageUrl }}" class="event-image" alt="{{ event.titre }}" loading="lazy">
+    </div>
+    <div class="event-header">
+        <h1>{{ event.titre }}</h1>
+        <span class="badge {% if event.date < date() %}bg-secondary{% else %}" style="background-color: #168D8D"{% endif %}>
+            {% if event.date < date() %}Terminé{% else %}À venir{% endif %}
+        </span>
+    </div>
+
+    <div class="event-description mb-4">
+        <p>{{ event.description|nl2br }}</p>
+    </div>
+
+    <div class="event-info">
+        <div class="event-info-item">
+            <i class="fas fa-calendar-day"></i>
+            <span><strong>Date :</strong> {{ event.date|date('d/m/Y H:i') }}</span>
+        </div>
+        <div class="event-info-item">
+            <i class="fas fa-map-marker-alt"></i>
+            <span><strong>Lieu :</strong> {{ event.lieu }}</span>
+        </div>
+        <div class="event-info-item">
+            <i class="fas fa-users"></i>
+            <div style="flex-grow: 1;">
+                <strong>Capacité :</strong> 
+                <div class="progress participants-progress">
+                    <div class="progress-bar" 
+                         role="progressbar" 
+                         style="width: {{ (event.participations|length / event.capacite) * 100 }}%; background-color: #168D8D"
+                         aria-valuenow="{{ (event.participations|length / event.capacite) * 100 }}"
+                         aria-valuemin="0"
+                         aria-valuemax="100">
+                    </div>
+                </div>
+                <span class="participants-count">{{ event.participations|length }} / {{ event.capacite }} participants</span>
+            </div>
+        </div>
+        
+
+    <div class="d-flex justify-content-between mt-4">
+        <a href="{{ path('app_events_front') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Retour aux événements
+        </a>
+        
+    
+             
+                
+            
+    </div>
+</div>
+{% endblock %}
+
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Gestion des participations
+            document.querySelectorAll('.participate-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const eventId = this.getAttribute('data-event-id');
+                    const button = this;
+                    
+                    fetch(`/event/${eventId}/participate`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({
+                            _token: '{{ csrf_token('participate') }}'
+                        })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            // Mettre à jour l'interface
+                            button.innerHTML = '<i class="fas fa-times me-1"></i> Annuler participation';
+                            button.classList.remove('btn-success');
+                            button.classList.add('btn-danger');
+                            button.classList.remove('participate-btn');
+                            button.classList.add('cancel-participation-btn');
+                            
+                            // Ajouter l'événement click pour annuler
+                            button.addEventListener('click', cancelParticipation);
+                            
+                            // Mettre à jour la barre de progression
+                            updateParticipationStats(eventId, data.currentParticipants, data.capacity);
+                            
+                            // Notification
+                            showToast('Participation enregistrée avec succès!', 'success');
+                        } else {
+                            showToast(data.message || 'Erreur lors de la participation', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        showToast('Une erreur est survenue', 'error');
+                        console.error('Error:', error);
+                    });
+                });
+            });
+
+            // Fonction pour annuler une participation
+            function cancelParticipation() {
+                const eventId = this.getAttribute('data-event-id');
+                const button = this;
+                
+                fetch(`/event/${eventId}/cancel-participation`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        _token: '{{ csrf_token('cancel-participation') }}'
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        // Mettre à jour l'interface
+                        button.innerHTML = '<i class="fas fa-plus me-1"></i> Participer';
+                        button.classList.remove('btn-danger');
+                        button.classList.add('btn-success');
+                        button.classList.remove('cancel-participation-btn');
+                        button.classList.add('participate-btn');
+                        
+                        // Mettre à jour la barre de progression
+                        updateParticipationStats(eventId, data.currentParticipants, data.capacity);
+                        
+                        // Notification
+                        showToast('Participation annulée avec succès', 'info');
+                    } else {
+                        showToast(data.message || 'Erreur lors de l\'annulation', 'error');
+                    }
+                })
+                .catch(error => {
+                    showToast('Une erreur est survenue', 'error');
+                    console.error('Error:', error);
+                });
+            }
+
+            // Fonction pour mettre à jour les stats de participation
+            function updateParticipationStats(eventId, currentParticipants, capacity) {
+                const participationPercentage = (currentParticipants / capacity) * 100;
+                const progressBar = document.querySelector('.progress-bar');
+                const participantsText = document.querySelector('.participants-count');
+                
+                if (progressBar) {
+                    progressBar.style.width = `${participationPercentage}%`;
+                    progressBar.setAttribute('aria-valuenow', participationPercentage);
+                }
+                
+                if (participantsText) {
+                    participantsText.textContent = `${currentParticipants} / ${capacity} participants`;
+                }
+                
+                // Désactiver les boutons si complet
+                if (participationPercentage >= 100) {
+                    document.querySelectorAll('.participate-btn').forEach(btn => {
+                        btn.disabled = true;
+                    });
+                } else {
+                    document.querySelectorAll('.participate-btn').forEach(btn => {
+                        btn.disabled = false;
+                    });
+                }
+            }
+
+            // Fonction pour afficher les notifications
+            function showToast(message, type) {
+                const toastContainer = document.getElementById('toastContainer') || createToastContainer();
+                const toast = document.createElement('div');
+                
+                const bgColor = type === 'success' ? '#168D8D' : type === 'error' ? '#dc3545' : '#17a2b8';
+                
+                toast.className = `toast show align-items-center text-white border-0`;
+                toast.style.backgroundColor = bgColor;
+                toast.setAttribute('role', 'alert');
+                toast.setAttribute('aria-live', 'assertive');
+                toast.setAttribute('aria-atomic', 'true');
+                toast.innerHTML = `
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                `;
+                
+                toastContainer.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.remove();
+                }, 5000);
+            }
+
+            function createToastContainer() {
+                const container = document.createElement('div');
+                container.id = 'toastContainer';
+                container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+                container.style.zIndex = '11';
+                document.body.appendChild(container);
+                return container;
+            }
+
+            // Attacher l'événement aux boutons d'annulation existants
+            document.querySelectorAll('.cancel-participation-btn').forEach(button => {
+                button.addEventListener('click', cancelParticipation);
+            });
+        });
+                document.addEventListener('DOMContentLoaded', function() {
+            // Participation with confirmation
+            let currentEventId = null;
+            const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+            
+            document.querySelectorAll('.participate-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    currentEventId = this.getAttribute('data-event-id');
+                    confirmationModal.show();
+                });
+            });
+
+            document.getElementById('confirmParticipationBtn').addEventListener('click', function() {
+                if (!currentEventId) return;
+                
+                confirmationModal.hide();
+                participate(currentEventId);
+            });
+
+            function participate(eventId) {
+                const button = document.querySelector(`.participate-btn[data-event-id="${eventId}"]`);
+                if (!button) return;
+                
+                fetch(`/event/${eventId}/participate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        _token: '{{ csrf_token('participate') }}'
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        // Update button
+                        button.innerHTML = '<i class="fas fa-times me-1"></i> Annuler participation';
+                        button.classList.remove('btn-success');
+                        button.classList.add('btn-danger');
+                        button.classList.remove('participate-btn');
+                        button.classList.add('cancel-participation-btn');
+                        
+                        // Add click event for cancellation
+                        button.addEventListener('click', cancelParticipation);
+                        
+                        // Update progress bar
+                        updateParticipationStats(eventId, data.currentParticipants, data.capacity);
+                        
+                        showToast('Participation confirmée avec succès!', 'success');
+                    } else {
+                        showToast(data.message || 'Erreur lors de la participation', 'error');
+                    }
+                })
+                .catch(error => {
+                    showToast('Une erreur est survenue', 'error');
+                    console.error('Error:', error);
+                });
+            }
+
+            // Cancel participation
+            function cancelParticipation(event) {
+                event.preventDefault();
+                const eventId = this.getAttribute('data-event-id');
+                const button = this;
+                
+                fetch(`/event/${eventId}/cancel-participation`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        _token: '{{ csrf_token('cancel-participation') }}'
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        // Update button
+                        button.innerHTML = '<i class="fas fa-plus me-1"></i> Participer';
+                        button.classList.remove('btn-danger');
+                        button.classList.add('btn-success');
+                        button.classList.remove('cancel-participation-btn');
+                        button.classList.add('participate-btn');
+                        
+                        // Add click event for participation
+                        button.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            currentEventId = eventId;
+                            confirmationModal.show();
+                        });
+                        
+                        // Update progress bar
+                        updateParticipationStats(eventId, data.currentParticipants, data.capacity);
+                        
+                        showToast('Participation annulée avec succès', 'info');
+                    } else {
+                        showToast(data.message || 'Erreur lors de l\'annulation', 'error');
+                    }
+                })
+                .catch(error => {
+                    showToast('Une erreur est survenue', 'error');
+                    console.error('Error:', error);
+                });
+            }
+
+            // Update participation stats
+            function updateParticipationStats(eventId, currentParticipants, capacity) {
+                const participationPercentage = (currentParticipants / capacity) * 100;
+                const progressBar = document.querySelector('.progress-bar');
+                const participantsText = document.querySelector('.participants-count');
+                
+                if (progressBar) {
+                    progressBar.style.width = `${participationPercentage}%`;
+                    progressBar.setAttribute('aria-valuenow', participationPercentage);
+                }
+                
+                if (participantsText) {
+                    participantsText.textContent = `${currentParticipants} / ${capacity} participants`;
+                }
+                
+                // Disable participate buttons if full
+                document.querySelectorAll(`.participate-btn[data-event-id="${eventId}"]`).forEach(btn => {
+                    btn.disabled = currentParticipants >= capacity;
+                });
+            }
+    </script>
+{% endblock %}

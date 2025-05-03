@@ -12,6 +12,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Entity\User;
 use App\Form\UserType;
+use Doctrine\Persistence\ManagerRegistry;
 
 class UserController extends AbstractController
 {
@@ -30,6 +31,33 @@ class UserController extends AbstractController
         ]);
         
 
+    }
+
+
+    // Dans votre contrôleur
+    #[Route('/dashboard', name: 'admin_dashboard')]
+    public function dashboard(UserRepository $userRepository): Response
+    {
+        $todayStart = new \DateTime('today', new \DateTimeZone('UTC')); // Use your server's timezone
+        $todayEnd = new \DateTime('tomorrow', new \DateTimeZone('UTC'));
+
+        $todayUsersCount = $userRepository->countTodayUsers($todayStart, $todayEnd);
+
+        $lastWeekStart = (clone $todayStart)->modify('-7 days');
+        $lastWeekEnd = (clone $todayEnd)->modify('-7 days');
+        $lastWeekUsersCount = $userRepository->countTodayUsers($lastWeekStart, $lastWeekEnd);
+
+        $percentageChange = $lastWeekUsersCount > 0 
+            ? (($todayUsersCount - $lastWeekUsersCount) / $lastWeekUsersCount) * 100
+            : 0;
+
+        // Pass the variables to the template
+        return $this->render('baseBack.html.twig', [
+            'todayUsersCount' => $todayUsersCount,
+            'percentageChange' => $percentageChange,
+            'todayLogins' => $userRepository->countTodayLogins(),
+            'newUsersToday' => $userRepository->countNewUsersToday()
+        ]);
     }
 
     #[Route('/dashboard/user/new', name: 'app_dashboard_user_new')]

@@ -340,7 +340,13 @@
   </style>
 </head>
 <body>
-  {% include '_flash_messages.html.twig' %}
+  {% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="alert alert-{{ label }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+  {% endfor %}
   <section data-bs-version="5.1" class="login-container">
     <div class="container">
       <div class="row justify-content-center">
@@ -371,6 +377,7 @@
               </div>
           {% endif %}
               
+
               <div class="form-group floating-label">
                 <input type="email" name="email" id="inputEmail" value="{{ last_username }}" 
                 class="form-control" placeholder=" " autocomplete="email" required autofocus>

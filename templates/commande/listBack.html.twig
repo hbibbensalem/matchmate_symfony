@@ -1,0 +1,110 @@
+{% extends 'baseBack.html.twig' %}
+
+{% block title %}Liste des Commandes{% endblock %}
+{% block current_page %}Commandes{% endblock %}
+{% block page_title %}Liste des Commandes{% endblock %}
+
+{% block main_content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+                    <h6>Liste des commandes</h6>
+                    <form action="{{ path('app_commande_delete_annulees') }}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer toutes les commandes annulées ?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete_annulees') }}">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Supprimer les commandes annulées
+                        </button>
+                    </form>
+                   
+                </div>
+                <div class="card-body px-0 pt-0 pb-2">
+                    <div class="table-responsive p-0">
+                        <table class="table align-items-center mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Id commande</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Id Client</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Produit commandé</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Quantité commandée</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Statut</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Supprimer</th>
+                                    
+                                    
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for commande in commandes %}
+                                <tr>
+                                    <td class="ps-4">
+                                        <p class="text-xs font-weight-bold mb-0">{{ commande.idCommande }}</p>
+                                    </td>
+                                    <td class="ps-4">
+                                        <p class="text-xs font-weight-bold mb-0">{{ commande.user.idUser}}</p>
+                                    </td>
+                                    <td>
+                                        <p class="text-xs font-weight-bold mb-0">{{ commande.dateCommande|date('d/m/Y H:i') }}</p>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex px-2 py-1">
+                                            {% if commande.produit and commande.produit.imageProduit %}
+                                            <div>
+                                                <img src="{{ asset('uploads/' ~ commande.produit.imageProduit) }}" 
+                                                     class="avatar avatar-sm me-3" 
+                                                     alt="{{ commande.produit.nomProduit }}"
+                                                     onerror="this.src='{{ asset('assets/img/image-placeholder.jpg')}}';">
+                                            </div>
+                                            {% endif %}
+                                            <div class="d-flex flex-column justify-content-center">
+                                                <h6 class="mb-0 text-sm">
+                                                    {% if commande.produit %}
+                                                        {{ commande.produit.nomProduit }}
+                                                        <p class="text-xs text-secondary mb-0">
+                                                            Réf: {{ commande.produit.refProduit }}
+                                                        </p>
+                                                    {% else %}
+                                                        <span class="text-danger">Produit supprimé</span>
+                                                    {% endif %}
+                                                </h6>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <p class="text-xs font-weight-bold mb-3">{{ commande.quantiteCommande }}</p>
+                                        <p class="text-xs text-secondary mb-3">
+                                            {{ (commande.quantiteCommande * commande.produit.prixProduit)|number_format(2, ',', ' ') }} Dt
+                                        </p>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-sm 
+                                            {% if commande.statusCommande == 'completed' %}bg-gradient-success
+                                            {% elseif commande.statusCommande == 'cancelled' %}bg-gradient-danger
+                                            {% else %}bg-gradient-secondary{% endif %}">
+                                            {{ commande.statusCommande }}
+                                        </span>
+                                    </td>
+                                    
+                                       
+                                    
+                                        
+                                
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center p-4">
+                                        <p class="text-sm text-secondary mb-0">Aucune commande trouvée</p>
+                                    
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

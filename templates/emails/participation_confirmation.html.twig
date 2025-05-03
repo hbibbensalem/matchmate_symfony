@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmation de participation</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background-color: #10888D;
+            padding: 20px;
+            text-align: center;
+            color: white;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            padding: 25px;
+        }
+        .match-details {
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .match-details ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        .match-details li {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eaeaea;
+        }
+        .match-details li:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        .footer {
+            text-align: center;
+            padding: 15px;
+            background-color: #f5f5f5;
+            font-size: 12px;
+            color: #777777;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #FF6B00;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+        .logo {
+            max-width: 150px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>Confirmation de participation</h1>
+        </div>
+        
+        <div class="content">
+            <p>Bonjour {{ user.prenomUser }},</p>
+            
+            <p>Vous avez rejoint avec succès le match suivant :</p>
+            
+            <div class="match-details">
+                <ul>
+                    <li><strong>Sport :</strong> {{ match.typesport }}</li>
+                    <li><strong>Date :</strong> {{ match.date|date('d/m/Y') }}</li>
+                    <li><strong>Heure :</strong> {{ match.heure|date('H:i') }}</li>
+                    <li><strong>Lieu :</strong> {{ match.localisation }}</li>
+                    <li><strong>Organisateur :</strong> {{ match.id_user.prenomUser }} {{ match.id_user.nomUser }}</li>
+                </ul>
+            </div>
+            
+            <p>Vous pouvez retrouver cette information dans votre espace personnel à tout moment.</p>
+            
+           
+            
+            <p style="margin-top: 20px;">Si vous ne pouvez pas participer, merci d'annuler votre participation depuis votre espace personnel.</p>
+        </div>
+        
+        <div class="footer">
+            <p>Cet email vous a été envoyé automatiquement, merci de ne pas y répondre.</p>
+            <p>&copy; {{ "now"|date("Y") }} Votre Application Sportive. Tous droits réservés.</p>
+        </div>
+    </div>
+</body>
+</html>

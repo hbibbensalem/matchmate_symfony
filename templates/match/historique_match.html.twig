@@ -1,0 +1,209 @@
+{% extends 'baseFront.html.twig' %}
+
+{% block title %}Mon Historique de Matchs{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<style>
+    /* Espace entre navbar et contenu */
+  .content-spacer {
+    margin-top: 150px; /* Ajustez la valeur pour un espace plus grand */
+}
+
+    
+    .nav-tabs .nav-link.active {
+        font-weight: bold;
+        background-color: #f8f9fa;
+        border-bottom-color: #f8f9fa;
+    }
+    .table th {
+        white-space: nowrap;
+    }
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+    .tab-content {
+        padding: 15px;
+    }
+    /* Style personnalisé pour la section historique */
+    .history-container {
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+    .history-title {
+        color: #10888D;
+        margin-bottom: 30px;
+        font-weight: 600;
+    }
+    .card-header-tabs {
+        border-bottom: none;
+    }
+    .nav-tabs .nav-link {
+        color: #495057;
+        border: none;
+        padding: 12px 20px;
+    }
+    .nav-tabs .nav-link.active {
+        color: #10888D;
+        border-bottom: 3px solid #10888D;
+        background-color: transparent;
+    }
+    .table {
+        margin-top: 20px;
+    }
+    .table th {
+        background-color: #f8f9fa;
+        color: #495057;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="content-spacer"></div> <!-- Espace ajouté ici -->
+<div class="container history-container">
+    <div class="card">
+        <div class="card-header">
+            <ul class="nav nav-tabs card-header-tabs" id="matchTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="organises-tab" data-bs-toggle="tab" data-bs-target="#organises" type="button" role="tab" aria-controls="organises" aria-selected="true">
+                        Matchs Organisés
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="participations-tab" data-bs-toggle="tab" data-bs-target="#participations" type="button" role="tab" aria-controls="participations" aria-selected="false">
+                        Mes Participations
+                    </button>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="card-body">
+            <div class="tab-content" id="matchTabsContent">
+                <!-- Onglet Matchs Organisés -->
+                <div class="tab-pane fade show active" id="organises" role="tabpanel" aria-labelledby="organises-tab">
+                  
+                    {% if matchsOrganises|length > 0 %}
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Heure</th>
+                                        <th>Sport</th>
+                                        <th>Localisation</th>
+                                        <th>Statut</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for match in matchsOrganises %}
+                                    <tr>
+                                        <td>{{ match.date|date('d/m/Y') }}</td>
+                                        <td>{{ match.heure }}</td>
+                                        <td>{{ match.typesport }}</td>
+                                        <td>{{ match.localisation }}</td>
+                                        <td>
+                                            <span class="badge 
+                                                {% if match.statut == 'complet' %}bg-success
+                                                {% elseif match.statut == 'en attente' %}bg-warning text-dark
+                                                {% else %}bg-secondary
+                                                {% endif %}">
+                                                {{ match.statut }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="{{ path('match_edit', {'id': match.id}) }}" 
+                                               class="btn btn-sm btn-primary">
+                                                <i class="fas fa-edit"></i> Modifier
+                                            </a>
+                                            <form method="post" action="{{ path('match_delete', {'id': match.id}) }}" 
+                                                  style="display:inline" 
+                                                  onsubmit="return confirm('Êtes-vous sûr de vouloir annuler ce match?');">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ match.id) }}">
+                                                <button class="btn btn-sm btn-danger">
+                                                    <i class="fas fa-trash"></i> Annuler
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">Vous n'avez organisé aucun match.</div>
+                    {% endif %}
+                </div>
+                
+                <!-- Onglet Participations -->
+                <div class="tab-pane fade" id="participations" role="tabpanel" aria-labelledby="participations-tab">
+                    <h3 class="mb-4">Matchs auxquels j'ai participé</h3>
+                    {% if matchsParticipations|length > 0 %}
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Heure</th>
+                                        <th>Sport</th>
+                                        <th>Organisateur</th>
+                                        <th>Localisation</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in matchsParticipations %}
+                                    {% set match = item.match %}
+                                    <tr>
+                                        <td>{{ match.date|date('d/m/Y') }}</td>
+                                        <td>{{ match.heure }}</td>
+                                        <td>{{ match.typesport }}</td>
+                                        <td>{{ match.id_user.prenomUser }} {{ match.id_user.nomUser }}</td>
+                                        <td>{{ match.localisation }}</td>
+                                        <td>
+                                            <form method="post" 
+                                                  action="{{ path('participation_delete', {'id': item.participation_id}) }}" 
+                                                  style="display:inline" 
+                                                  onsubmit="return confirm('Êtes-vous sûr de vouloir quitter ce match?');">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ item.participation_id) }}">
+                                                <button class="btn btn-sm btn-warning">
+                                                    <i class="fas fa-sign-out-alt"></i> Quitter
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">Vous n'avez participé à aucun match.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+    // Initialisation des onglets
+    document.addEventListener('DOMContentLoaded', function() {
+        var matchTabs = document.querySelectorAll('#matchTabs button[data-bs-toggle="tab"]');
+        matchTabs.forEach(function(tab) {
+            tab.addEventListener('click', function(event) {
+                event.preventDefault();
+                var tabTrigger = new bootstrap.Tab(this);
+                tabTrigger.show();
+            });
+        });
+    });
+</script>
+{% endblock %}

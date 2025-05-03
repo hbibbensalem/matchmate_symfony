@@ -1,0 +1,19 @@
+<h3>Détails du produit #{{ produit.idProduit }}</h3>
+
+<p><strong>Nom :</strong> {{ produit.nomProduit }}</p>
+<p><strong>Référence :</strong> {{ produit.refProduit }}</p>
+<p><strong>Prix :</strong> {{ produit.prixProduit|number_format(2, ',', ' ') }} DT</p>
+<p><strong>Stock :</strong> {{ produit.quantiteProduit }}</p>
+
+{% if produit.imageProduit %}
+    <p>
+        <img src="{{ absolute_url(asset('uploads/' ~ produit.imageProduit)) }}" 
+             style="max-width: 200px;">
+    </p>
+{% endif %}
+
+<p><strong>Description :</strong><br>
+{{ produit.descriptionProduit }}</p>
+
+<hr>
+<p>Envoyé le {{ date }}</p>
